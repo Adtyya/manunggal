@@ -1,0 +1,39 @@
+/* core tailwind  */
+@import './tailwind/index.css';
+
+/* layout  */
+@import './layout/index.css';
+
+/* components  */
+@import './components/index.css';
+
+@media print {
+    @page {
+        size: auto;
+        margin: 100;
+    }
+
+
+    img {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.CodeMirror,
+.CodeMirror-scroll {
+    max-height: 500px;
+}
+
+.CodeMirror-fullscreen.CodeMirror {
+    max-height: none;
+}
+
+.CodeMirror-fullscreen .CodeMirror-scroll {
+    max-height: none;
+}
+
+.editor-toolbar.fullscreen,
+.CodeMirror-fullscreen { 
+    z-index: 101 !important; 
+}
