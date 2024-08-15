@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 // components
 import {
   Alert,
@@ -14,30 +14,25 @@ import {
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import DatePicker from "react-date-picker";
 import { api } from "@/utils/axios";
-import { formatDate } from "@/utils/formatdate";
 import { useNavigate } from "react-router-dom";
-import SimpleMDE from "react-simplemde-editor";
 import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
-import PreviewImage from "@/components/global/PreviewImage";
 import InputPrice from "@/components/global/InputPrice";
-import { Trash, PlusLg } from "react-bootstrap-icons";
 
 export default function CreateTicket() {
   const navigate = useNavigate();
   const ticket = useTicket();
 
   const [error, setError] = useState(false);
-  const [available, setAvailable] = useState(true);
 
   const schema = yup.object().shape({
+    code: yup.string().required(),
     name: yup.string().required(),
-    phone: yup.string().required(),
-    email: yup.string().email().required(),
-    address: yup.string(),
-    isAvailable: yup.bool(),
+    description: yup.string().required(),
+    stock: yup.number().required(),
+    unit: yup.string(),
+    price: yup.string().required(),
   });
 
   const {
@@ -51,10 +46,9 @@ export default function CreateTicket() {
   });
 
   async function onSubmit(data) {
-    data.isActive = available;
-    const res = await api.post("/customer", data);
+    const res = await api.post("/product", data);
     if (res?.status === 201 || res?.status === 200) {
-      navigate("/dashboard/list-customer");
+      navigate("/dashboard/list-product");
       ticket.setSuccess(true);
     } else {
       setError(true);
@@ -66,7 +60,7 @@ export default function CreateTicket() {
       {/* page title  */}
       <Row>
         <Column className="w-full md:w-1/2 px-4">
-          <p className="text-xl font-bold mt-3 mb-5">Create Customer</p>
+          <p className="text-xl font-bold mt-3 mb-5">Create Product</p>
         </Column>
       </Row>
 
@@ -86,49 +80,58 @@ export default function CreateTicket() {
             >
               <div className="grid grid-cols-2 gap-5">
                 <InputLabel
-                  name="name"
+                  name="code"
                   id="name"
-                  label="Name"
+                  label="Prodcut Code"
+                  register={register}
+                  required
+                  error={errors?.code?.message}
+                />
+                <InputLabel
+                  name="name"
+                  id="subname"
+                  label="Product Name"
                   register={register}
                   required
                   error={errors?.name?.message}
                 />
-                <InputLabel
-                  name="phone"
-                  id="subname"
-                  label="Phone"
-                  register={register}
-                  required
-                  onKeyPress={(event) => {
-                    if (!/[0-9]/.test(event.key)) {
-                      event.preventDefault();
-                    }
-                  }}
-                  error={errors?.phone?.message}
-                />
-                <InputLabel
-                  name="email"
-                  type="email"
-                  id="notes1"
-                  label="Email"
-                  register={register}
-                  required
-                  error={errors?.email?.message}
-                />
                 <Textarea
-                  name="address"
-                  id="notes2"
-                  label="Address"
+                  name="description"
+                  label="Description"
                   register={register}
-                  error={errors?.address?.message}
+                  required
+                  error={errors?.description?.message}
                 />
-                <div className="flex justify-between items-center w-fit space-x-4">
-                  <p>Active</p>
-                  <Switch
-                    onChange={() => setAvailable((prev) => !prev)}
-                    checked={available}
-                  />
-                </div>
+                <InputLabel
+                  name="stock"
+                  id="notes2"
+                  label="Stock"
+                  required
+                  type="number"
+                  register={register}
+                  error={errors?.stock?.message}
+                />
+                <InputLabel
+                  name="unit"
+                  id="notes2"
+                  label="Unit"
+                  required
+                  register={register}
+                  error={errors?.unit?.message}
+                />
+                <InputPrice
+                  label="Price"
+                  required
+                  onChange={(val) =>
+                    setValue(
+                      "price",
+                      parseInt(
+                        val.target.value.replace("Rp.", "").replace(/\./g, "")
+                      )
+                    )
+                  }
+                  value={getValues("price")}
+                />
               </div>
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">

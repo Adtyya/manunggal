@@ -330,7 +330,7 @@ export default function RootAdmin() {
         <Route exact path="/edit-customer/:id" element={<EditCustomer />} />
 
         <Route exact path="/list-product" element={<Product />} />
-        <Route exact path="/create-product" element={<CreateProductM />} />
+        <Route exact path="/m/create-product" element={<CreateProductM />} />
         <Route exact path="/edit-product/:id" element={<EditProduct />} />
       </Routes>
     </RootLayout>

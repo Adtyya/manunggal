@@ -53,7 +53,7 @@ export default function TableVisitors(props) {
             useOnChange
           />
         </div>
-        <Link to="/dashboard/create-customer" className="w-48">
+        <Link to="/dashboard/m/create-product" className="w-48">
           <Button
             className="mb-4 block sm:inline-block w-full sm:w-full"
             color="gold"
@@ -117,7 +117,7 @@ export default function TableVisitors(props) {
                       </td>
                       <td className="text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <Link to={`/dashboard/edit-customer/${item._id}`}>
+                          <Link to={`/dashboard/edit-product/${item._id}`}>
                             <Button color="light" size="small">
                               <PencilSquare className="inline text-primary-color" />
                             </Button>
