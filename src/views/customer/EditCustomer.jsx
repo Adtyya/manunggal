@@ -26,7 +26,7 @@ export default function EditTicket() {
   const navigate = useNavigate();
 
   const { data, isLoading } = useQuery(
-    ["agentById", { id: param.id }],
+    ["customerById", { id: param.id }],
     getTicketsById
   );
 
@@ -75,9 +75,9 @@ export default function EditTicket() {
 
   async function onSubmit(data) {
     data.isActive = available;
-    const res = await api.patch(`/agent/${param.id}`, data);
+    const res = await api.patch(`/customer/${param.id}`, data);
     if (res?.status === 201 || res?.status === 200) {
-      navigate("/dashboard/list-agent");
+      navigate("/dashboard/list-customer");
       ticket.setSuccess(true);
     } else {
       setError(true);
@@ -89,7 +89,7 @@ export default function EditTicket() {
       {/* page title  */}
       <Row>
         <Column className="w-full md:w-1/2 px-4">
-          <p className="text-xl font-bold mt-3 mb-5">Edit Agent</p>
+          <p className="text-xl font-bold mt-3 mb-5">Edit Customer</p>
         </Column>
       </Row>
 
@@ -155,7 +155,7 @@ export default function EditTicket() {
               </div>
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
-                <Link to="/dashboard/list-agent">
+                <Link to="/dashboard/list-customer">
                   <Button color="outline-gold">Back</Button>
                 </Link>
                 <Button type="submit" color="gold" disabled={isSubmitting}>

@@ -29,6 +29,7 @@ import {
 import { CreateUser, EditUser, UserList } from "./user";
 import MainDashboard from "./maindashboard/dashboard";
 import { Agents, CreateAgent, EditAgent } from "./agent";
+import { CreateCustomer, Customer, EditCustomer } from "./customer";
 
 export default function RootAdmin() {
   return (
@@ -322,6 +323,10 @@ export default function RootAdmin() {
         <Route exact path="/list-agent" element={<Agents />} />
         <Route exact path="/create-agent" element={<CreateAgent />} />
         <Route exact path="/edit-agent/:id" element={<EditAgent />} />
+
+        <Route exact path="/list-customer" element={<Customer />} />
+        <Route exact path="/create-customer" element={<CreateCustomer />} />
+        <Route exact path="/edit-customer/:id" element={<EditCustomer />} />
       </Routes>
     </RootLayout>
   );

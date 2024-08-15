@@ -99,6 +99,11 @@ export default function CreateTicket() {
                   label="Phone"
                   register={register}
                   required
+                  onKeyPress={(event) => {
+                    if (!/[0-9]/.test(event.key)) {
+                      event.preventDefault();
+                    }
+                  }}
                   error={errors?.phone?.message}
                 />
                 <InputLabel
@@ -127,7 +132,7 @@ export default function CreateTicket() {
               </div>
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
-                <Link to="/dashboard/list-tickets">
+                <Link to="/dashboard/list-agent">
                   <Button color="outline-gold">Back</Button>
                 </Link>
                 <Button type="submit" color="gold" disabled={isSubmitting}>

@@ -21,7 +21,7 @@ export default function Agents() {
       {/* page title  */}
       <Row>
         <Column className="w-full md:w-1/2 px-4">
-          <p className="text-xl font-bold mt-3 mb-5">Manage Agent</p>
+          <p className="text-xl font-bold mt-3 mb-5">Manage Customer</p>
         </Column>
       </Row>
 

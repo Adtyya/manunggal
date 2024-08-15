@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 // components
 import {
   Alert,
@@ -7,28 +7,27 @@ import {
   Card,
   Button,
   InputLabel,
+  Uploader,
   Switch,
   Textarea,
 } from "@/components/reactdash-ui";
-import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "react-query";
-import { getTicketsById } from "./service";
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
+import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import DatePicker from "react-date-picker";
 import { api } from "@/utils/axios";
+import { formatDate } from "@/utils/formatdate";
+import { useNavigate } from "react-router-dom";
+import SimpleMDE from "react-simplemde-editor";
 import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
+import PreviewImage from "@/components/global/PreviewImage";
+import InputPrice from "@/components/global/InputPrice";
+import { Trash, PlusLg } from "react-bootstrap-icons";
 
-export default function EditTicket() {
-  const param = useParams();
-  const ticket = useTicket();
+export default function CreateTicket() {
   const navigate = useNavigate();
-
-  const { data, isLoading } = useQuery(
-    ["agentById", { id: param.id }],
-    getTicketsById
-  );
+  const ticket = useTicket();
 
   const [error, setError] = useState(false);
   const [available, setAvailable] = useState(true);
@@ -41,43 +40,21 @@ export default function EditTicket() {
     isAvailable: yup.bool(),
   });
 
-  const initializeValue = useMemo(() => {
-    if (!isLoading && data) {
-      setAvailable(data.isActive);
-      return {
-        name: data.name,
-        phone: data.phone,
-        address: data.address,
-        email: data.email,
-      };
-    }
-    return null;
-  }, [data, isLoading]);
-
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
-    watch,
+    getValues,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: initializeValue,
   });
-
-  useEffect(() => {
-    if (initializeValue) {
-      Object.keys(initializeValue).forEach((key) => {
-        setValue(key, initializeValue[key]);
-      });
-    }
-  }, [initializeValue, setValue]);
 
   async function onSubmit(data) {
     data.isActive = available;
-    const res = await api.patch(`/agent/${param.id}`, data);
+    const res = await api.post("/customer", data);
     if (res?.status === 201 || res?.status === 200) {
-      navigate("/dashboard/list-agent");
+      navigate("/dashboard/list-customer");
       ticket.setSuccess(true);
     } else {
       setError(true);
@@ -89,7 +66,7 @@ export default function EditTicket() {
       {/* page title  */}
       <Row>
         <Column className="w-full md:w-1/2 px-4">
-          <p className="text-xl font-bold mt-3 mb-5">Edit Agent</p>
+          <p className="text-xl font-bold mt-3 mb-5">Create Customer</p>
         </Column>
       </Row>
 
@@ -155,7 +132,7 @@ export default function EditTicket() {
               </div>
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
-                <Link to="/dashboard/list-agent">
+                <Link to="/dashboard/list-customer">
                   <Button color="outline-gold">Back</Button>
                 </Link>
                 <Button type="submit" color="gold" disabled={isSubmitting}>
