@@ -70,8 +70,8 @@ export default function TableVisitors(props) {
               <th>Date</th>
               <th className="text-left">Name</th>
               <th className="text-left">Email</th>
-              <th>Phone</th>
-              <th>Address</th>
+              <th className="text-left">Phone</th>
+              <th className="text-left">Address</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -98,11 +98,11 @@ export default function TableVisitors(props) {
                       <td>
                         <p>{item.email}</p>
                       </td>
-                      <td className="text-center">
+                      <td>
                         <p>{item.phone}</p>
                       </td>
                       <td>
-                        <p className="w-52 text-center">{item.address}</p>
+                        <p className="w-52">{item.address}</p>
                       </td>
                       <td className="text-center">
                         <div className="flex items-center justify-center gap-1.5">

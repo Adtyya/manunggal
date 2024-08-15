@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "react-query";
 import { getTickets } from "../service";
 import { toNumberFormat } from "@/utils/toNumber";
 import useInformationUser from "@/components/global/useInformationUser";
+import formatRupiah from "@/utils/formatRupiah";
 
 export default function TableVisitors(props) {
   const ticket = useTicket();
@@ -16,7 +17,7 @@ export default function TableVisitors(props) {
 
   const { isLoading, data } = useQuery(
     [
-      "customers",
+      "products",
       {
         page: ticket.currentPage,
         search: ticket.search,
@@ -68,10 +69,12 @@ export default function TableVisitors(props) {
           <thead>
             <tr className="!bg-secondary-color dark:bg-gray-900 dark:bg-opacity-40 rounded-2xl">
               <th>Date</th>
+              <th className="text-left">Code</th>
               <th className="text-left">Name</th>
-              <th className="text-left">Email</th>
-              <th className="text-left">Phone</th>
-              <th className="text-left">Address</th>
+              <th className="text-left">Description</th>
+              <th className="text-left">Stock</th>
+              <th className="text-left">Unit</th>
+              <th className="text-left">Price</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -93,16 +96,24 @@ export default function TableVisitors(props) {
                     <tr key={id}>
                       <td className="text-center">{formatDate(item.date)}</td>
                       <td>
+                        <p>{item.code}</p>
+                      </td>
+                      <td>
                         <p>{item.name}</p>
                       </td>
                       <td>
-                        <p>{item.email}</p>
+                        <p>{item.description}</p>
                       </td>
                       <td>
-                        <p>{item.phone}</p>
+                        <p>
+                          {item.stock} {item.unit}
+                        </p>
                       </td>
                       <td>
-                        <p className="w-52">{item.address}</p>
+                        <p>{item.unit}</p>
+                      </td>
+                      <td>
+                        <p>{formatRupiah(item.price)}</p>
                       </td>
                       <td className="text-center">
                         <div className="flex items-center justify-center gap-1.5">
