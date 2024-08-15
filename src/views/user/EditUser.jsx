@@ -76,11 +76,7 @@ export default function CreateUser() {
   async function onSubmit(data) {
     data.isActive = active;
     const res = await api.patch(`/user/${param.id}`, data);
-    if (
-      res?.status === 201 ||
-      res?.status === 200 ||
-      res?.status === 200
-    ) {
+    if (res?.status === 201 || res?.status === 200 || res?.status === 200) {
       user.setEdit(true);
       navigate("/dashboard/list-users");
     } else {
@@ -131,8 +127,8 @@ export default function CreateUser() {
                       value: "admin",
                     },
                     {
-                      title: "Front Office",
-                      value: "front office",
+                      title: "Sales",
+                      value: "sales",
                     },
                   ]}
                   register={register}

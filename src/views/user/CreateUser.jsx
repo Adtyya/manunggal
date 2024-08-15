@@ -95,8 +95,8 @@ export default function CreateUser() {
                       value: "admin",
                     },
                     {
-                      title: "Front Office",
-                      value: "front office",
+                      title: "Sales",
+                      value: "sales",
                     },
                   ]}
                   register={register}
