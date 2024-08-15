@@ -28,7 +28,7 @@ export const getAvailableTickets = async (query) => {
 export const getTicketsById = async ({ queryKey }) => {
   try {
     const [key, query] = queryKey;
-    const res = await api.get(`/ticket/${query.id}`);
+    const res = await api.get(`/agent/${query.id}`);
     return res.data;
   } catch (error) {
     return error;
@@ -37,7 +37,7 @@ export const getTicketsById = async ({ queryKey }) => {
 
 export const deleteTicketsById = async (id) => {
   try {
-    const res = await api.delete(`/ticket/${id}`);
+    const res = await api.delete(`/agent/${id}`);
     return res.data;
   } catch (error) {
     return error;
