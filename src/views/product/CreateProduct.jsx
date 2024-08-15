@@ -135,7 +135,7 @@ export default function CreateTicket() {
               </div>
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
-                <Link to="/dashboard/list-customer">
+                <Link to="/dashboard/list-product">
                   <Button color="outline-gold">Back</Button>
                 </Link>
                 <Button type="submit" color="gold" disabled={isSubmitting}>

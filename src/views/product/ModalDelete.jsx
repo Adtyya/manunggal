@@ -15,7 +15,7 @@ export default function ModalDelete({ open, setOpen, selected }) {
       setLoading(true);
       await deleteTicketsById(selected);
       ticket.setDelete(true);
-      client.invalidateQueries("customers");
+      client.invalidateQueries("products");
     } catch (error) {
       console.warn("Something went wrong");
     } finally {

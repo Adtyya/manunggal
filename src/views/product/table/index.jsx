@@ -102,7 +102,7 @@ export default function TableVisitors(props) {
                         <p>{item.name}</p>
                       </td>
                       <td>
-                        <p>{item.description}</p>
+                        <p className="w-52">{item.description}</p>
                       </td>
                       <td>
                         <p>
@@ -117,7 +117,7 @@ export default function TableVisitors(props) {
                       </td>
                       <td className="text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <Link to={`/dashboard/edit-product/${item._id}`}>
+                          <Link to={`/dashboard/m/edit-product/${item._id}`}>
                             <Button color="light" size="small">
                               <PencilSquare className="inline text-primary-color" />
                             </Button>
