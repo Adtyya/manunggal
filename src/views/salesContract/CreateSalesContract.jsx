@@ -24,6 +24,8 @@ import { getAgentBySearch, getAllAgent } from "./service";
 import { useQuery } from "react-query";
 import TableItems from "./table/items";
 import ModalAddProduct from "./ModalAddProduct";
+import NumberFormat from "@/utils/numberFormat";
+import lodash from "lodash";
 
 const style = {
   control: (base) => ({
@@ -54,9 +56,11 @@ export default function CreateTicket() {
     contractType: yup.string().required(),
     agent: yup.string().required(),
     deliveryFee: yup.number().required(),
-    totalPrice: yup.number().required(),
+    totalPrice: yup.number(),
     notes: yup.string(),
     payment: yup.string().required(),
+    tax: yup.number(),
+    dp: yup.number(),
   });
 
   const defaultOptions = useMemo(() => {
@@ -65,23 +69,45 @@ export default function CreateTicket() {
     });
   }, [agentList]);
 
-  console.log(items);
-
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
-    getValues,
+    watch,
   } = useForm({
     resolver: yupResolver(schema),
   });
 
+  const formState = watch();
+  const price = lodash.sumBy(items, (item) => item?.price * item?.qty);
+
+  const tax = lodash.multiply(price, formState.tax / 100);
+  const dp = lodash.multiply(price, formState.dp / 100);
+
   async function onSubmit(data) {
-    data.unit.toLowerCase();
-    const res = await api.post("/product", data);
+    delete data.tax;
+
+    data.tax = {
+      percentage: formState.tax,
+      amount: tax,
+    };
+
+    delete data.dp;
+
+    data.dp = {
+      percentage: formState.deliveryFee,
+      amount: dp,
+    };
+
+    data.items = items;
+    data.totalPrice = price + tax + Number(formState.deliveryFee) - dp;
+
+    data.contractDate = contractDate;
+
+    const res = await api.post("/sales-contract", data);
     if (res?.status === 201 || res?.status === 200) {
-      navigate("/dashboard/list-product");
+      navigate("/dashboard/list-sales-contract");
       ticket.setSuccess(true);
     } else {
       setError(true);
@@ -147,6 +173,7 @@ export default function CreateTicket() {
                     ]}
                     required
                     register={register}
+                    showInitialValue
                   />
                   <InputDate
                     label="Select Contract Date"
@@ -190,6 +217,7 @@ export default function CreateTicket() {
                   <Select
                     name="payment"
                     label="Payment Type"
+                    showInitialValue
                     options={[
                       {
                         title: "Cash",
@@ -208,13 +236,31 @@ export default function CreateTicket() {
               </Card>
               <Card>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  <InputLabel label="Delivery Fee" type="number" />
-                  <InputLabel label="Tax (percent)" type="number" />
-                  <InputLabel label="Dp (percent)" type="number" />
+                  <InputLabel
+                    label="Delivery Fee"
+                    type="number"
+                    name="deliveryFee"
+                    register={register}
+                  />
+                  <InputLabel
+                    label="Tax (percent)"
+                    type="number"
+                    name="tax"
+                    register={register}
+                  />
+                  <InputLabel
+                    label="Dp (percent)"
+                    type="number"
+                    name="dp"
+                    register={register}
+                  />
                 </div>
                 <div className="mt-3">
                   <h3 className="font-semibold text-xl">
-                    Total Contract Amount
+                    Total Contract Amount -{" "}
+                    {NumberFormat(
+                      price + Number(formState.deliveryFee) + tax - dp
+                    )}
                   </h3>
                 </div>
               </Card>
