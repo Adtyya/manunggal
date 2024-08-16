@@ -107,6 +107,7 @@ export default function ModalAddProduct({ open, setOpen, setItems }) {
             </Button>
             <Button
               color="gold"
+              disabled={qty <= 0}
               onClick={() => {
                 state.qty = qty;
                 state.notes = notes;
