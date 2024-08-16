@@ -179,7 +179,7 @@ export default function CreateTicket() {
                 />
               </Card>
               <Card>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <Textarea
                     name="note"
                     label="Contract Notes"
@@ -204,6 +204,18 @@ export default function CreateTicket() {
                     register={register}
                     error={errors?.payment?.message}
                   />
+                </div>
+              </Card>
+              <Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <InputLabel label="Delivery Fee" type="number" />
+                  <InputLabel label="Tax (percent)" type="number" />
+                  <InputLabel label="Dp (percent)" type="number" />
+                </div>
+                <div className="mt-3">
+                  <h3 className="font-semibold text-xl">
+                    Total Contract Amount
+                  </h3>
                 </div>
               </Card>
 

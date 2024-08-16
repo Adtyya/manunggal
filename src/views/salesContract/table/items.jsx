@@ -55,6 +55,7 @@ export default function TableItems(props) {
               <th className="text-left">Name</th>
               <th className="text-left">Qty</th>
               <th className="text-left">Price</th>
+              <th className="text-left">Total Price</th>
               <th className="text-left">Unit</th>
               <th className="text-left">Notes</th>
               <th>Action</th>
@@ -89,6 +90,9 @@ export default function TableItems(props) {
                       </td>
                       <td>
                         <p>{NumberFormat(item.price)}</p>
+                      </td>
+                      <td>
+                        <p>{NumberFormat(item.price * item.qty)}</p>
                       </td>
                       <td>{item.unit}</td>
                       <td>{item.notes}</td>
