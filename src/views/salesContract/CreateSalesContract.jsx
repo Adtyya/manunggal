@@ -22,6 +22,7 @@ import InputDate from "@/components/global/InputDate";
 import AsyncSelect from "react-select/async";
 import { getAgentBySearch, getAllAgent } from "./service";
 import { useQuery } from "react-query";
+import TableItems from "./table/items";
 
 const style = {
   control: (base) => ({
@@ -107,100 +108,95 @@ export default function CreateTicket() {
               lagi
             </Alert>
           )}
-          <Card className="relative p-6">
+          <div className="relative p-6">
             <form
-              className="w-full"
+              className="w-full space-y-5"
               onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <Select
-                  name="contractType"
-                  label="Contract Type"
-                  options={[
-                    {
-                      title: "Export",
-                      value: "EXPORT",
-                    },
-                    {
-                      title: "Local",
-                      value: "LOCAL",
-                    },
-                    {
-                      title: "Kaber",
-                      value: "KABER",
-                    },
-                    {
-                      title: "Stock Order",
-                      value: "STOCK ORDER",
-                    },
-                    {
-                      title: "AFVAL",
-                      value: "AFVAL",
-                    },
-                  ]}
-                  required
-                  register={register}
-                />
-                <InputDate
-                  label="Select Contract Date"
-                  value={contractDate}
-                  onChange={(e) => setContractDate(e)}
-                  required
-                />
-                <div className="w-full">
-                  <label className="inline-block mb-2">
-                    Agent
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <AsyncSelect
-                    cacheOptions
-                    loadOptions={promise}
-                    defaultOptions={defaultOptions}
-                    className="w-full pb-4"
-                    styles={style}
-                    onChange={(event) => setValue("agent", event.value)}
-                    noOptionsMessage={() => "Agent not found"}
+              <Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <Select
+                    name="contractType"
+                    label="Contract Type"
+                    options={[
+                      {
+                        title: "Export",
+                        value: "EXPORT",
+                      },
+                      {
+                        title: "Local",
+                        value: "LOCAL",
+                      },
+                      {
+                        title: "Kaber",
+                        value: "KABER",
+                      },
+                      {
+                        title: "Stock Order",
+                        value: "STOCK ORDER",
+                      },
+                      {
+                        title: "AFVAL",
+                        value: "AFVAL",
+                      },
+                    ]}
+                    required
+                    register={register}
+                  />
+                  <InputDate
+                    label="Select Contract Date"
+                    value={contractDate}
+                    onChange={(e) => setContractDate(e)}
+                    required
+                  />
+                  <div className="w-full">
+                    <label className="inline-block mb-2">
+                      Agent
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <AsyncSelect
+                      cacheOptions
+                      loadOptions={promise}
+                      defaultOptions={defaultOptions}
+                      className="w-full pb-4"
+                      styles={style}
+                      onChange={(event) => setValue("agent", event.value)}
+                      noOptionsMessage={() => "Agent not found"}
+                    />
+                  </div>
+                </div>
+              </Card>
+              <Card>
+                <TableItems />
+              </Card>
+              <Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <Textarea
+                    name="note"
+                    label="Contract Notes"
+                    register={register}
+                    required
+                    error={errors?.notes?.message}
+                  />
+                  <Select
+                    name="payment"
+                    label="Payment Type"
+                    options={[
+                      {
+                        title: "Cash",
+                        value: "cash",
+                      },
+                      {
+                        title: "Bank Transaction",
+                        value: "bank transaction",
+                      },
+                    ]}
+                    required
+                    register={register}
+                    error={errors?.payment?.message}
                   />
                 </div>
-                <InputLabel
-                  name="name"
-                  id="subname"
-                  label="Product Name"
-                  register={register}
-                  required
-                  error={errors?.name?.message}
-                />
-                <Textarea
-                  name="description"
-                  label="Description"
-                  register={register}
-                  required
-                  error={errors?.description?.message}
-                />
-                <InputLabel
-                  name="stock"
-                  id="notes2"
-                  label="Stock"
-                  required
-                  type="number"
-                  register={register}
-                  error={errors?.stock?.message}
-                />
-
-                <InputPrice
-                  label="Price"
-                  required
-                  onChange={(val) =>
-                    setValue(
-                      "price",
-                      parseInt(
-                        val.target.value.replace("Rp.", "").replace(/\./g, "")
-                      )
-                    )
-                  }
-                  value={getValues("price")}
-                />
-              </div>
+              </Card>
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
                 <Link to="/dashboard/list-product">
@@ -211,7 +207,7 @@ export default function CreateTicket() {
                 </Button>
               </div>
             </form>
-          </Card>
+          </div>
         </Column>
       </Row>
     </>
