@@ -10,6 +10,7 @@ import { getTickets } from "../service";
 import { toNumberFormat } from "@/utils/toNumber";
 import useInformationUser from "@/components/global/useInformationUser";
 import formatRupiah from "@/utils/formatRupiah";
+import NumberFormat from "@/utils/numberFormat";
 
 export default function TableVisitors(props) {
   const ticket = useTicket();
@@ -17,7 +18,7 @@ export default function TableVisitors(props) {
 
   const { isLoading, data } = useQuery(
     [
-      "products",
+      "contractSales",
       {
         page: ticket.currentPage,
         search: ticket.search,
@@ -70,8 +71,9 @@ export default function TableVisitors(props) {
             <tr className="!bg-secondary-color dark:bg-gray-900 dark:bg-opacity-40 rounded-2xl">
               <th>Contract Date</th>
               <th className="text-left">Contract Type</th>
-              <th className="text-left">Agent Name</th>
+              {/* <th className="text-left">Agent Name</th> */}
               <th className="text-left">Price</th>
+              <th className="text-left">Tax</th>
               <th className="text-left">DP</th>
               <th className="text-left">Payment</th>
               <th className="text-left">Status</th>
@@ -94,26 +96,29 @@ export default function TableVisitors(props) {
                 data?.docs?.map((item, id) => {
                   return (
                     <tr key={id}>
-                      <td className="text-center">{formatDate(item.date)}</td>
-                      <td>
-                        <p>{item.code}</p>
+                      <td className="text-center">
+                        {formatDate(item.contractDate)}
                       </td>
                       <td>
+                        <p>{item.contractType}</p>
+                      </td>
+                      {/* <td>
                         <p>{item.name}</p>
+                      </td> */}
+                      <td>
+                        <p>{NumberFormat(item.totalPrice)}</p>
                       </td>
                       <td>
-                        <p className="w-52">{item.description}</p>
+                        <p>{NumberFormat(item.tax.amount || 0)}</p>
                       </td>
                       <td>
-                        <p>
-                          {item.stock} {item.unit}
-                        </p>
+                        <p>{NumberFormat(item.dp.amount || 0)}</p>
                       </td>
                       <td>
-                        <p>{item.unit}</p>
+                        <p className="capitalize">{item.payment}</p>
                       </td>
                       <td>
-                        <p>{formatRupiah(item.price)}</p>
+                        <p className="uppercase">{item.status}</p>
                       </td>
                       <td className="text-center">
                         <div className="flex items-center justify-center gap-1.5">
