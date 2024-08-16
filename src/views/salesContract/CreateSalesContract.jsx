@@ -23,6 +23,7 @@ import AsyncSelect from "react-select/async";
 import { getAgentBySearch, getAllAgent } from "./service";
 import { useQuery } from "react-query";
 import TableItems from "./table/items";
+import ModalAddProduct from "./ModalAddProduct";
 
 const style = {
   control: (base) => ({
@@ -46,6 +47,8 @@ export default function CreateTicket() {
   const [contractDate, setContractDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), today.getDate())
   );
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([]);
 
   const schema = yup.object().shape({
     contractType: yup.string().required(),
@@ -61,6 +64,8 @@ export default function CreateTicket() {
       return { value: item._id, label: item.name };
     });
   }, [agentList]);
+
+  console.log(items);
 
   const {
     register,
@@ -167,7 +172,11 @@ export default function CreateTicket() {
                 </div>
               </Card>
               <Card>
-                <TableItems />
+                <TableItems
+                  setOpen={() => setOpen(true)}
+                  items={items}
+                  setItems={setItems}
+                />
               </Card>
               <Card>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -197,6 +206,12 @@ export default function CreateTicket() {
                   />
                 </div>
               </Card>
+
+              <ModalAddProduct
+                open={open}
+                setOpen={() => setOpen(false)}
+                setItems={setItems}
+              />
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
                 <Link to="/dashboard/list-product">

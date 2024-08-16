@@ -10,6 +10,7 @@ import { getTickets } from "../service";
 import { toNumberFormat } from "@/utils/toNumber";
 import useInformationUser from "@/components/global/useInformationUser";
 import formatRupiah from "@/utils/formatRupiah";
+import NumberFormat from "@/utils/numberFormat";
 
 export default function TableItems(props) {
   const ticket = useTicket();
@@ -34,22 +35,23 @@ export default function TableItems(props) {
         <div className="w-full">
           <div></div>
         </div>
-        <Link to="/dashboard/create-sales-contract" className="w-48">
+        <div className="w-48">
           <Button
             className="mb-4 block sm:inline-block w-full sm:w-full"
             color="gold"
+            onClick={props.setOpen}
           >
             Add Product
             <PlusLg className="inline-block ltr:ml-1 rtl:mr-1 bi bi-plus-lg" />
           </Button>
-        </Link>
+        </div>
       </div>
 
       <div className="overflow-auto">
         <table className="table-sorter table-bordered-bottom w-full text-gray-500 dark:text-gray-400 dataTable-table">
           <thead>
             <tr className="!bg-secondary-color dark:bg-gray-900 dark:bg-opacity-40 rounded-2xl">
-              <th>Code</th>
+              <th className="text-left">Code</th>
               <th className="text-left">Name</th>
               <th className="text-left">Qty</th>
               <th className="text-left">Price</th>
@@ -58,7 +60,7 @@ export default function TableItems(props) {
               <th>Action</th>
             </tr>
           </thead>
-          {0 === 0 ? (
+          {props.items?.length === 0 ? (
             <tbody>
               <tr>
                 <td colSpan={7} className="text-center">
@@ -73,10 +75,9 @@ export default function TableItems(props) {
                   <td>Loading data....</td>
                 </tr>
               ) : (
-                data?.docs?.map((item, id) => {
+                props?.items?.map((item, id) => {
                   return (
                     <tr key={id}>
-                      <td className="text-center">{formatDate(item.date)}</td>
                       <td>
                         <p>{item.code}</p>
                       </td>
@@ -84,33 +85,28 @@ export default function TableItems(props) {
                         <p>{item.name}</p>
                       </td>
                       <td>
-                        <p className="w-52">{item.description}</p>
+                        <p>{item.qty}</p>
                       </td>
                       <td>
-                        <p>
-                          {item.stock} {item.unit}
-                        </p>
+                        <p>{NumberFormat(item.price)}</p>
                       </td>
-                      <td></td>
+                      <td>{item.unit}</td>
+                      <td>{item.notes}</td>
                       <td className="text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <Link to={`/dashboard/m/edit-product/${item._id}`}>
-                            <Button color="light" size="small">
-                              <PencilSquare className="inline text-primary-color" />
-                            </Button>
-                          </Link>
-                          {user.role === "super admin" && (
-                            <Button
-                              color="light"
-                              size="small"
-                              onClick={() => {
-                                ticket.setModalDelete(true);
-                                setSelectedId(item._id);
-                              }}
-                            >
-                              <Trash className="inline text-primary-color" />
-                            </Button>
-                          )}
+                          <Button
+                            color="light"
+                            size="small"
+                            onClick={() => {
+                              props.setItems((prev) => {
+                                return prev.filter(
+                                  (val) => val._id !== item._id
+                                );
+                              });
+                            }}
+                          >
+                            <Trash className="inline text-primary-color" />
+                          </Button>
                         </div>
                       </td>
                     </tr>
