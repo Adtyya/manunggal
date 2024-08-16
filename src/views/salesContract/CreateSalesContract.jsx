@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 // components
 import {
   Alert,
@@ -7,8 +7,6 @@ import {
   Card,
   Button,
   InputLabel,
-  Uploader,
-  Switch,
   Textarea,
   Select,
 } from "@/components/reactdash-ui";
@@ -21,11 +19,27 @@ import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
 import InputPrice from "@/components/global/InputPrice";
 import InputDate from "@/components/global/InputDate";
+import AsyncSelect from "react-select/async";
+import { getAgentBySearch, getAllAgent } from "./service";
+import { useQuery } from "react-query";
+
+const style = {
+  control: (base) => ({
+    ...base,
+    // This line disable the blue border
+    boxShadow: "none",
+  }),
+};
 
 export default function CreateTicket() {
   const navigate = useNavigate();
   const ticket = useTicket();
   const today = new Date();
+
+  const { data: agentList, isLoading } = useQuery(
+    ["getAllAgent", { page: 1, search: "" }],
+    getAllAgent
+  );
 
   const [error, setError] = useState(false);
   const [contractDate, setContractDate] = useState(
@@ -40,6 +54,12 @@ export default function CreateTicket() {
     notes: yup.string(),
     payment: yup.string().required(),
   });
+
+  const defaultOptions = useMemo(() => {
+    return agentList?.docs?.map((item) => {
+      return { value: item._id, label: item.name };
+    });
+  }, [agentList]);
 
   const {
     register,
@@ -61,6 +81,13 @@ export default function CreateTicket() {
       setError(true);
     }
   }
+
+  const promise = async (q) => {
+    const res = await getAgentBySearch(q);
+    return res.docs?.map((item) => {
+      return { value: item._id, label: item.name };
+    });
+  };
 
   return (
     <>
@@ -120,14 +147,21 @@ export default function CreateTicket() {
                   onChange={(e) => setContractDate(e)}
                   required
                 />
-                <InputLabel
-                  name="code"
-                  id="name"
-                  label="Prodcut Code"
-                  register={register}
-                  required
-                  error={errors?.code?.message}
-                />
+                <div className="w-full">
+                  <label className="inline-block mb-2">
+                    Agent
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <AsyncSelect
+                    cacheOptions
+                    loadOptions={promise}
+                    defaultOptions={defaultOptions}
+                    className="w-full pb-4"
+                    styles={style}
+                    onChange={(event) => setValue("agent", event.value)}
+                    noOptionsMessage={() => "Agent not found"}
+                  />
+                </div>
                 <InputLabel
                   name="name"
                   id="subname"

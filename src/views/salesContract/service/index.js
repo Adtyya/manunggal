@@ -43,3 +43,24 @@ export const deleteTicketsById = async (id) => {
     return error;
   }
 };
+
+export const getAgentBySearch = async (query) => {
+  try {
+    const res = await api.get(`/agent?page=1&perPage=25&search=${query}`);
+    return res.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getAllAgent = async ({ queryKey }) => {
+  try {
+    const [key, query] = queryKey;
+    const res = await api.get(
+      `/agent?page=${query.page}&perPage=10&search=${query.search}`
+    );
+    return res.data;
+  } catch (error) {
+    return error;
+  }
+};
