@@ -9,6 +9,7 @@ import {
   InputLabel,
   Switch,
   Textarea,
+  Select,
 } from "@/components/reactdash-ui";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "react-query";
@@ -20,13 +21,14 @@ import { api } from "@/utils/axios";
 import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
 import InputPrice from "@/components/global/InputPrice";
+import { data } from "./data";
 
 export default function EditTicket() {
   const param = useParams();
   const ticket = useTicket();
   const navigate = useNavigate();
 
-  const { data, isLoading } = useQuery(
+  const { data: datas, isLoading } = useQuery(
     ["productById", { id: param.id }],
     getTicketsById
   );
@@ -43,18 +45,18 @@ export default function EditTicket() {
   });
 
   const initializeValue = useMemo(() => {
-    if (!isLoading && data) {
+    if (!isLoading && datas) {
       return {
-        name: data.name,
-        code: data.code,
-        description: data.description,
-        stock: data.stock,
-        unit: data.unit,
-        price: data.price,
+        name: datas.name,
+        code: datas.code,
+        description: datas.description,
+        stock: datas.stock,
+        unit: datas.unit.toLowerCase(),
+        price: datas.price,
       };
     }
     return null;
-  }, [data, isLoading]);
+  }, [datas, isLoading]);
 
   const {
     register,
@@ -140,13 +142,12 @@ export default function EditTicket() {
                   register={register}
                   error={errors?.stock?.message}
                 />
-                <InputLabel
+                <Select
                   name="unit"
-                  id="notes2"
                   label="Unit"
+                  options={data}
                   required
                   register={register}
-                  error={errors?.unit?.message}
                 />
                 <InputPrice
                   label="Price"

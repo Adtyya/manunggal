@@ -24,87 +24,23 @@ export default function Sidebar(props) {
     },
     {
       id: 2,
-      title: "Daftar Pengunjung",
-      url: "/dashboard/list-visitors",
+      title: "Customer",
+      url: "/dashboard/list-customer",
       icon: <VisitorIcon />,
       user: ["admin", "super admin", "front office"],
     },
     {
       id: 2,
-      title: "Belum Bayar",
-      url: "/dashboard/list-pending-visitors",
+      title: "Agent",
+      url: "/dashboard/list-agent",
+      icon: <VisitorIcon />,
+      user: ["admin", "super admin", "front office"],
+    },
+    {
+      id: 2,
+      title: "Product",
+      url: "/dashboard/list-product",
       icon: <PendingIcon />,
-      user: ["admin", "super admin"],
-    },
-    {
-      id: 3,
-      title: "Scan QR",
-      url: "/dashboard/scan-qr",
-      icon: <ScanIcon />,
-      user: ["super admin", "front office"],
-    },
-    {
-      id: 4,
-      title: "Pameran",
-      url: "/dashboard/list-tickets",
-      icon: <TicketIcon />,
-      user: ["admin", "super admin"],
-    },
-    {
-      id: 5,
-      title: "Library",
-      url: "/dashboard/library",
-      icon: <LibraryIcon />,
-      submenu: [
-        {
-          id: 51,
-          title: "Banner",
-          url: "/dashboard/list-banners",
-        },
-        {
-          id: 52,
-          title: "Collection",
-          url: "/dashboard/list-collections",
-        },
-      ],
-      user: ["admin", "super admin"],
-    },
-    {
-      id: 6,
-      title: "Shop",
-      url: "/dashboard/shop",
-      icon: <ShopIcon />,
-      submenu: [
-        {
-          id: 61,
-          title: "Order",
-          url: "/dashboard/list-orders",
-        },
-        {
-          id: 62,
-          title: "Product",
-          url: "/dashboard/list-products",
-        },
-        {
-          id: 63,
-          title: "Variant",
-          url: "/dashboard/list-variants",
-        },
-      ],
-      user: ["admin", "super admin"],
-    },
-    {
-      id: 7,
-      title: "Content Manager",
-      url: "/dashboard/content-manager",
-      icon: <ContentIcon />,
-      submenu: [
-        {
-          id: 71,
-          title: "Blog",
-          url: "/dashboard/list-blogs",
-        },
-      ],
       user: ["admin", "super admin"],
     },
     {

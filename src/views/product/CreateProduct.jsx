@@ -10,6 +10,7 @@ import {
   Uploader,
   Switch,
   Textarea,
+  Select,
 } from "@/components/reactdash-ui";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -19,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
 import InputPrice from "@/components/global/InputPrice";
+import { data } from "./data";
 
 export default function CreateTicket() {
   const navigate = useNavigate();
@@ -46,6 +48,7 @@ export default function CreateTicket() {
   });
 
   async function onSubmit(data) {
+    data.unit.toLowerCase();
     const res = await api.post("/product", data);
     if (res?.status === 201 || res?.status === 200) {
       navigate("/dashboard/list-product");
@@ -111,13 +114,12 @@ export default function CreateTicket() {
                   register={register}
                   error={errors?.stock?.message}
                 />
-                <InputLabel
+                <Select
                   name="unit"
-                  id="notes2"
                   label="Unit"
+                  options={data}
                   required
                   register={register}
-                  error={errors?.unit?.message}
                 />
                 <InputPrice
                   label="Price"
