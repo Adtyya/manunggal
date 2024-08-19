@@ -84,6 +84,14 @@ export default function EditTicket() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="w-full h-96 flex items-center justify-center">
+        <p className="capitalize">Loading agent...</p>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* page title  */}

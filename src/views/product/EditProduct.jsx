@@ -64,9 +64,12 @@ export default function EditTicket() {
     formState: { errors, isSubmitting },
     setValue,
     getValues,
+    watch,
   } = useForm({
     resolver: yupResolver(schema),
   });
+
+  const formState = watch();
 
   useEffect(() => {
     if (initializeValue) {
@@ -84,6 +87,14 @@ export default function EditTicket() {
     } else {
       setError(true);
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-96 flex items-center justify-center">
+        <p className="capitalize">Loading Product...</p>
+      </div>
+    );
   }
 
   return (
@@ -160,7 +171,7 @@ export default function EditTicket() {
                       )
                     )
                   }
-                  value={getValues("price")}
+                  value={formState?.price}
                 />
               </div>
 
