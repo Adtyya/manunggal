@@ -30,6 +30,7 @@ import TableItems from "./table/items";
 import ModalAddProduct from "./ModalAddProduct";
 import NumberFormat from "@/utils/numberFormat";
 import lodash from "lodash";
+import ModalSetAsPaid from "./ModalSetAsPaid";
 
 const style = {
   control: (base) => ({
@@ -61,6 +62,7 @@ export default function EditSalesContract() {
   );
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
+  const [paid, setPaid] = useState(false);
 
   const schema = yup.object().shape({
     contractType: yup.string().required(),
@@ -167,7 +169,9 @@ export default function EditSalesContract() {
       {/* page title  */}
       <Row>
         <Column className="w-full md:w-1/2 px-4">
-          <p className="text-xl font-bold mt-3 mb-5">Edit Sales Contract</p>
+          <p className="text-xl font-bold mt-3 mb-5">
+            Edit Sales Contract - {salesContract?.contractId}
+          </p>
         </Column>
       </Row>
 
@@ -190,6 +194,7 @@ export default function EditSalesContract() {
                   <Select
                     name="contractType"
                     label="Contract Type"
+                    disabled
                     options={[
                       {
                         title: "Export",
@@ -311,37 +316,40 @@ export default function EditSalesContract() {
                     />
                   </div>
                 </Card>
-                <Card>
-                  <p className="font-medium">
-                    Delivery Fee :{" "}
-                    <span className="font-bold">
-                      {`${NumberFormat(formState.deliveryFee || 0)}`}
-                    </span>
-                  </p>
-                  <p className="font-medium">
-                    Dp :{" "}
-                    <span className="font-bold">
+                <Card className="w-full">
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Delivery Fee</p>
+                    <p className="font-bold">
+                      : {`${NumberFormat(formState.deliveryFee || 0)}`}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Dp</p>
+                    <p className="font-bold">
+                      :{" "}
                       {`${NumberFormat(formState?.dp || 0)}% - ${NumberFormat(
                         dp?.toFixed(0) || 0
                       )}`}
-                    </span>
-                  </p>
-                  <p className="font-medium">
-                    Tax :{" "}
-                    <span className="font-bold">
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Tax</p>
+                    <p className="font-bold">
+                      :{" "}
                       {`${NumberFormat(formState?.tax || 0)}% - ${NumberFormat(
                         tax?.toFixed(0) || 0
                       )}`}
-                    </span>
-                  </p>
-                  <p className="font-medium">
-                    Total Contract Amount :{" "}
-                    <span className="font-bold">
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Total Contract Amount</p>
+                    <p className="font-bold">
+                      :{" "}
                       {NumberFormat(
                         price + Number(formState.deliveryFee) + tax - dp
                       )}
-                    </span>
-                  </p>
+                    </p>
+                  </div>
                 </Card>
               </div>
 
@@ -351,10 +359,23 @@ export default function EditSalesContract() {
                 setItems={setItems}
               />
 
+              <ModalSetAsPaid
+                open={paid}
+                setOpen={setPaid}
+                selected={salesContract?._id}
+              />
+
               <div className="flex justify-end items-center mt-8 space-x-3.5">
-                <Link to="/dashboard/list-product">
+                <Link to="/dashboard/list-sales-contract">
                   <Button color="outline-gold">Back</Button>
                 </Link>
+                <Button
+                  type="button"
+                  color="gold"
+                  onClick={() => setPaid(true)}
+                >
+                  {isSubmitting ? "Please wait..." : "Set as paid"}
+                </Button>
                 <Button type="submit" color="gold" disabled={isSubmitting}>
                   {isSubmitting ? "Please wait..." : "Save"}
                 </Button>

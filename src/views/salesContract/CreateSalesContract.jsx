@@ -259,37 +259,40 @@ export default function CreateTicket() {
                     />
                   </div>
                 </Card>
-                <Card>
-                  <p className="font-medium">
-                    Delivery Fee :{" "}
-                    <span className="font-bold">
-                      {`${NumberFormat(formState.deliveryFee || 0)}`}
-                    </span>
-                  </p>
-                  <p className="font-medium">
-                    Dp :{" "}
-                    <span className="font-bold">
+                <Card className="w-full">
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Delivery Fee</p>
+                    <p className="font-bold">
+                      : {`${NumberFormat(formState.deliveryFee || 0)}`}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Dp</p>
+                    <p className="font-bold">
+                      :{" "}
                       {`${NumberFormat(formState?.dp || 0)}% - ${NumberFormat(
                         dp?.toFixed(0) || 0
                       )}`}
-                    </span>
-                  </p>
-                  <p className="font-medium">
-                    Tax :{" "}
-                    <span className="font-bold">
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Tax</p>
+                    <p className="font-bold">
+                      :{" "}
                       {`${NumberFormat(formState?.tax || 0)}% - ${NumberFormat(
                         tax?.toFixed(0) || 0
                       )}`}
-                    </span>
-                  </p>
-                  <p className="font-medium">
-                    Total Contract Amount :{" "}
-                    <span className="font-bold">
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Total Contract Amount</p>
+                    <p className="font-bold">
+                      :{" "}
                       {NumberFormat(
                         price + Number(formState.deliveryFee) + tax - dp
                       )}
-                    </span>
-                  </p>
+                    </p>
+                  </div>
                 </Card>
               </div>
 
@@ -300,7 +303,7 @@ export default function CreateTicket() {
               />
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
-                <Link to="/dashboard/list-product">
+                <Link to="/dashboard/list-sales-contract">
                   <Button color="outline-gold">Back</Button>
                 </Link>
                 <Button type="submit" color="gold" disabled={isSubmitting}>

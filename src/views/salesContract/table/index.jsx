@@ -71,10 +71,9 @@ export default function TableVisitors(props) {
             <tr className="!bg-secondary-color dark:bg-gray-900 dark:bg-opacity-40 rounded-2xl">
               <th>Contract Date</th>
               <th className="text-left">Contract Type</th>
+              <th className="text-left">Contract ID</th>
               <th className="text-left">Agent Name</th>
               <th className="text-left">Price</th>
-              <th className="text-left">Tax</th>
-              <th className="text-left">DP</th>
               <th className="text-left">Payment</th>
               <th className="text-left">Status</th>
               <th>Action</th>
@@ -94,6 +93,14 @@ export default function TableVisitors(props) {
                 </tr>
               ) : (
                 data?.docs?.map((item, id) => {
+                  const bg_color =
+                    item.status === "paid"
+                      ? "text-green-700 bg-green-100"
+                      : item.status === "pending"
+                      ? "text-yellow-700 bg-yellow-100"
+                      : item.status === "cancel"
+                      ? "text-red-700 bg-red-100"
+                      : "text-pink-700 bg-pink-100";
                   return (
                     <tr key={id}>
                       <td className="text-center">
@@ -103,6 +110,9 @@ export default function TableVisitors(props) {
                         <p>{item.contractType}</p>
                       </td>
                       <td>
+                        <p>{item.contractId}</p>
+                      </td>
+                      <td>
                         <p>{item.agent.name}</p>
                       </td>
                       <td>
@@ -110,23 +120,16 @@ export default function TableVisitors(props) {
                           {NumberFormat(Number(item.totalPrice).toFixed(0))}
                         </p>
                       </td>
-                      <td>
-                        <p>
-                          {NumberFormat(
-                            Number(item.tax.amount || 0).toFixed(0)
-                          )}
-                        </p>
-                      </td>
-                      <td>
-                        <p>
-                          {NumberFormat(Number(item.dp.amount || 0).toFixed(0))}
-                        </p>
-                      </td>
+
                       <td>
                         <p className="capitalize">{item.payment}</p>
                       </td>
                       <td>
-                        <p className="uppercase">{item.status}</p>
+                        <button
+                          className={`capitalize rounded-full text-center w-full ${bg_color}`}
+                        >
+                          {item.status}
+                        </button>
                       </td>
                       <td className="text-center">
                         <div className="flex items-center justify-center gap-1.5">
