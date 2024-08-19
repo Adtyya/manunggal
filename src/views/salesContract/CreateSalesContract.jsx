@@ -86,26 +86,22 @@ export default function CreateTicket() {
   const dp = lodash.multiply(price, formState.dp / 100);
 
   async function onSubmit(data) {
-    delete data.tax;
-
-    data.tax = {
-      percentage: formState.tax,
-      amount: tax,
+    const newData = {
+      ...data,
+      tax: {
+        percentage: formState.tax,
+        amount: tax,
+      },
+      dp: {
+        percentage: formState.dp,
+        amount: dp,
+      },
+      items: items,
+      totalPrice: price + tax + Number(formState.deliveryFee) - dp,
+      contractDate: contractDate,
     };
 
-    delete data.dp;
-
-    data.dp = {
-      percentage: formState.dp,
-      amount: dp,
-    };
-
-    data.items = items;
-    data.totalPrice = price + tax + Number(formState.deliveryFee) - dp;
-
-    data.contractDate = contractDate;
-
-    const res = await api.post("/sales-contract", data);
+    const res = await api.post("/sales-contract", newData);
     if (res?.status === 201 || res?.status === 200) {
       navigate("/dashboard/list-sales-contract");
       ticket.setSuccess(true);

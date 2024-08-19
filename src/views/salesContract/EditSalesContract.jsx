@@ -92,6 +92,7 @@ export default function EditSalesContract() {
   const initializeValue = useMemo(() => {
     if (!loadingSalesContract && salesContract) {
       setItems(salesContract.items);
+      setContractDate(salesContract.contractDate);
       return {
         contractType: salesContract.contractType,
         agent: salesContract.agent._id,
@@ -122,26 +123,22 @@ export default function EditSalesContract() {
   const dp = lodash.multiply(price, formState.dp / 100);
 
   async function onSubmit(data) {
-    delete data.tax;
-
-    data.tax = {
-      percentage: formState.tax,
-      amount: tax,
+    const newData = {
+      ...data,
+      tax: {
+        percentage: formState.tax,
+        amount: tax,
+      },
+      dp: {
+        percentage: formState.dp,
+        amount: dp,
+      },
+      items: items,
+      totalPrice: price + tax + Number(formState.deliveryFee) - dp,
+      contractDate: contractDate,
     };
 
-    delete data.dp;
-
-    data.dp = {
-      percentage: formState.dp,
-      amount: dp,
-    };
-
-    data.items = items;
-    data.totalPrice = price + tax + Number(formState.deliveryFee) - dp;
-
-    data.contractDate = contractDate;
-
-    const res = await api.patch(`/sales-contract/${param.id}`, data);
+    const res = await api.patch(`/sales-contract/${param.id}`, newData);
     if (res?.status === 201 || res?.status === 200) {
       navigate("/dashboard/list-sales-contract");
       ticket.setEdit(true);
