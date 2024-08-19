@@ -71,7 +71,7 @@ export default function TableVisitors(props) {
             <tr className="!bg-secondary-color dark:bg-gray-900 dark:bg-opacity-40 rounded-2xl">
               <th>Contract Date</th>
               <th className="text-left">Contract Type</th>
-              {/* <th className="text-left">Agent Name</th> */}
+              <th className="text-left">Agent Name</th>
               <th className="text-left">Price</th>
               <th className="text-left">Tax</th>
               <th className="text-left">DP</th>
@@ -102,17 +102,25 @@ export default function TableVisitors(props) {
                       <td>
                         <p>{item.contractType}</p>
                       </td>
-                      {/* <td>
-                        <p>{item.name}</p>
-                      </td> */}
                       <td>
-                        <p>{NumberFormat(item.totalPrice)}</p>
+                        <p>{item.agent.name}</p>
                       </td>
                       <td>
-                        <p>{NumberFormat(item.tax.amount || 0)}</p>
+                        <p>
+                          {NumberFormat(Number(item.totalPrice).toFixed(0))}
+                        </p>
                       </td>
                       <td>
-                        <p>{NumberFormat(item.dp.amount || 0)}</p>
+                        <p>
+                          {NumberFormat(
+                            Number(item.tax.amount || 0).toFixed(0)
+                          )}
+                        </p>
+                      </td>
+                      <td>
+                        <p>
+                          {NumberFormat(Number(item.dp.amount || 0).toFixed(0))}
+                        </p>
                       </td>
                       <td>
                         <p className="capitalize">{item.payment}</p>

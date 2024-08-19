@@ -242,43 +242,57 @@ export default function CreateTicket() {
                       type="number"
                       name="deliveryFee"
                       register={register}
+                      required
+                      placeholder="0"
                     />
                     <InputLabel
                       label="Tax (percent)"
                       type="number"
                       name="tax"
                       register={register}
+                      required
+                      placeholder="0"
                     />
                     <InputLabel
                       label="Dp (percent)"
                       type="number"
                       name="dp"
                       register={register}
+                      required
+                      placeholder="0"
                     />
                   </div>
                 </Card>
                 <Card>
                   <p className="font-medium">
                     Delivery Fee :{" "}
-                    {`${NumberFormat(formState.deliveryFee || 0)}`}
+                    <span className="font-bold">
+                      {`${NumberFormat(formState.deliveryFee || 0)}`}
+                    </span>
                   </p>
                   <p className="font-medium">
                     Dp :{" "}
-                    {`${NumberFormat(formState?.dp || 0)}% - ${NumberFormat(
-                      dp || 0
-                    )}`}
+                    <span className="font-bold">
+                      {`${NumberFormat(formState?.dp || 0)}% - ${NumberFormat(
+                        dp?.toFixed(0) || 0
+                      )}`}
+                    </span>
                   </p>
                   <p className="font-medium">
                     Tax :{" "}
-                    {`${NumberFormat(formState?.tax || 0)}% - ${NumberFormat(
-                      tax || 0
-                    )}`}
+                    <span className="font-bold">
+                      {`${NumberFormat(formState?.tax || 0)}% - ${NumberFormat(
+                        tax?.toFixed(0) || 0
+                      )}`}
+                    </span>
                   </p>
                   <p className="font-medium">
                     Total Contract Amount :{" "}
-                    {NumberFormat(
-                      price + Number(formState.deliveryFee) + tax - dp
-                    )}
+                    <span className="font-bold">
+                      {NumberFormat(
+                        price + Number(formState.deliveryFee) + tax - dp
+                      )}
+                    </span>
                   </p>
                 </Card>
               </div>

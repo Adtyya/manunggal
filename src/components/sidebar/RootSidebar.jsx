@@ -44,6 +44,13 @@ export default function Sidebar(props) {
       user: ["admin", "super admin"],
     },
     {
+      id: 2,
+      title: "Sales Contract",
+      url: "/dashboard/list-sales-contract",
+      icon: <PendingIcon />,
+      user: ["admin", "super admin"],
+    },
+    {
       id: 8,
       title: "User",
       url: "/dashboard/list-users",

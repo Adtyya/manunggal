@@ -61,14 +61,6 @@ export default function EditSalesContract() {
   );
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
-  const [idAgent, setIdAgent] = useState("");
-
-  const { data: agentById, isLoading: loadingAgentById } = useQuery(
-    ["getAgentById", { id: idAgent || "" }],
-    getAgentById
-  );
-
-  console.log(idAgent);
 
   const schema = yup.object().shape({
     contractType: yup.string().required(),
@@ -100,10 +92,10 @@ export default function EditSalesContract() {
   const initializeValue = useMemo(() => {
     if (!loadingSalesContract && salesContract) {
       setItems(salesContract.items);
-      setIdAgent(salesContract.agent);
       return {
         contractType: salesContract.contractType,
-        agent: salesContract.agent,
+        agent: salesContract.agent._id,
+        agentName: salesContract.agent.name,
         deliveryFee: salesContract.deliveryFee,
         totalPrice: salesContract.totalPrice,
         notes: salesContract.notes,
@@ -164,6 +156,14 @@ export default function EditSalesContract() {
       return { value: item._id, label: item.name };
     });
   };
+
+  if (isLoading || loadingSalesContract) {
+    return (
+      <div className="w-full h-96 flex items-center justify-center">
+        <p className="capitalize">Loading sales contract...</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -237,10 +237,13 @@ export default function EditSalesContract() {
                       className="w-full pb-4"
                       styles={style}
                       value={{
-                        value: "66bc6a22e4c2a83b1acf291b",
-                        label: "ASDASD",
+                        value: formState.agent,
+                        label: formState.agentName,
                       }}
-                      onChange={(event) => setValue("agent", event.value)}
+                      onChange={(event) => {
+                        setValue("agent", event.value);
+                        setValue("agentName", event.label);
+                      }}
                       noOptionsMessage={() => "Agent not found"}
                     />
                   </div>
@@ -290,43 +293,57 @@ export default function EditSalesContract() {
                       type="number"
                       name="deliveryFee"
                       register={register}
+                      required
+                      placeholder="0"
                     />
                     <InputLabel
                       label="Tax (percent)"
                       type="number"
                       name="tax"
                       register={register}
+                      required
+                      placeholder="0"
                     />
                     <InputLabel
                       label="Dp (percent)"
                       type="number"
                       name="dp"
                       register={register}
+                      required
+                      placeholder="0"
                     />
                   </div>
                 </Card>
                 <Card>
                   <p className="font-medium">
                     Delivery Fee :{" "}
-                    {`${NumberFormat(formState.deliveryFee || 0)}`}
+                    <span className="font-bold">
+                      {`${NumberFormat(formState.deliveryFee || 0)}`}
+                    </span>
                   </p>
                   <p className="font-medium">
                     Dp :{" "}
-                    {`${NumberFormat(formState?.dp || 0)}% - ${NumberFormat(
-                      dp || 0
-                    )}`}
+                    <span className="font-bold">
+                      {`${NumberFormat(formState?.dp || 0)}% - ${NumberFormat(
+                        dp?.toFixed(0) || 0
+                      )}`}
+                    </span>
                   </p>
                   <p className="font-medium">
                     Tax :{" "}
-                    {`${NumberFormat(formState?.tax || 0)}% - ${NumberFormat(
-                      tax || 0
-                    )}`}
+                    <span className="font-bold">
+                      {`${NumberFormat(formState?.tax || 0)}% - ${NumberFormat(
+                        tax?.toFixed(0) || 0
+                      )}`}
+                    </span>
                   </p>
                   <p className="font-medium">
                     Total Contract Amount :{" "}
-                    {NumberFormat(
-                      price + Number(formState.deliveryFee || 0) + tax - dp
-                    )}
+                    <span className="font-bold">
+                      {NumberFormat(
+                        price + Number(formState.deliveryFee) + tax - dp
+                      )}
+                    </span>
                   </p>
                 </Card>
               </div>
