@@ -27,6 +27,7 @@ import ModalAddProduct from "./ModalAddProduct";
 import NumberFormat from "@/utils/numberFormat";
 import lodash from "lodash";
 import ModalSetAsPaidPost from "./ModalSetAsPaidPost";
+import InputPriceMod from "@/components/global/InputPriceMod";
 
 const style = {
   control: (base) => ({
@@ -57,7 +58,7 @@ export default function CreateTicket() {
   const schema = yup.object().shape({
     contractType: yup.string().required(),
     agent: yup.string().required(),
-    deliveryFee: yup.number().required(),
+    deliveryFee: yup.number(),
     totalPrice: yup.number(),
     notes: yup.string(),
     payment: yup.string().required(),
@@ -250,20 +251,26 @@ export default function CreateTicket() {
               <div className="grid grid-cols-2 gap-5">
                 <Card>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <InputLabel
+                    <InputPriceMod
                       label="Delivery Fee"
-                      type="number"
-                      name="deliveryFee"
-                      register={register}
-                      required
                       placeholder="0"
+                      onChange={(val) =>
+                        setValue(
+                          "deliveryFee",
+                          parseInt(
+                            val.target.value
+                              .replace("Rp.", "")
+                              .replace(/\./g, "")
+                          )
+                        )
+                      }
+                      value={formState.deliveryFee}
                     />
                     <InputLabel
                       label="Tax (percent)"
                       type="number"
                       name="tax"
                       register={register}
-                      required
                       placeholder="0"
                     />
                     <InputLabel
@@ -271,7 +278,6 @@ export default function CreateTicket() {
                       type="number"
                       name="dp"
                       register={register}
-                      required
                       placeholder="0"
                     />
                   </div>
