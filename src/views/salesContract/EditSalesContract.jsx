@@ -96,15 +96,15 @@ export default function EditSalesContract() {
       setItems(salesContract.items);
       setContractDate(salesContract.contractDate);
       return {
-        contractType: salesContract.contractType,
-        agent: salesContract.agent._id,
-        agentName: salesContract.agent.name,
-        deliveryFee: salesContract.deliveryFee,
-        totalPrice: salesContract.totalPrice,
-        notes: salesContract.notes,
-        payment: salesContract.payment,
-        tax: salesContract.tax.percentage,
-        dp: salesContract.dp.percentage,
+        contractType: salesContract?.contractType,
+        agent: salesContract?.agent?._id,
+        agentName: salesContract?.agent?.name,
+        deliveryFee: salesContract?.deliveryFee,
+        totalPrice: salesContract?.totalPrice,
+        notes: salesContract?.notes,
+        payment: salesContract?.payment,
+        tax: salesContract?.tax.percentage,
+        dp: salesContract?.dp.percentage,
       };
     }
     return null;

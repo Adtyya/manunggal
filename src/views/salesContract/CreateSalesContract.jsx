@@ -26,6 +26,7 @@ import TableItems from "./table/items";
 import ModalAddProduct from "./ModalAddProduct";
 import NumberFormat from "@/utils/numberFormat";
 import lodash from "lodash";
+import ModalSetAsPaidPost from "./ModalSetAsPaidPost";
 
 const style = {
   control: (base) => ({
@@ -51,6 +52,7 @@ export default function CreateTicket() {
   );
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
+  const [paid, setPaid] = useState(false);
 
   const schema = yup.object().shape({
     contractType: yup.string().required(),
@@ -109,6 +111,21 @@ export default function CreateTicket() {
       setError(true);
     }
   }
+
+  const payload = {
+    ...formState,
+    tax: {
+      percentage: formState.tax,
+      amount: tax,
+    },
+    dp: {
+      percentage: formState.dp,
+      amount: dp,
+    },
+    items: items,
+    totalPrice: price + tax + Number(formState.deliveryFee) - dp,
+    contractDate: contractDate,
+  };
 
   const promise = async (q) => {
     const res = await getAgentBySearch(q);
@@ -301,11 +318,24 @@ export default function CreateTicket() {
                 setOpen={() => setOpen(false)}
                 setItems={setItems}
               />
+              <ModalSetAsPaidPost
+                open={paid}
+                setOpen={setPaid}
+                data={payload}
+              />
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
                 <Link to="/dashboard/list-sales-contract">
                   <Button color="outline-gold">Back</Button>
                 </Link>
+                <Button
+                  type="button"
+                  color="gold"
+                  onClick={() => setPaid(true)}
+                  disabled={items.length === 0}
+                >
+                  {"Save & Set as paid"}
+                </Button>
                 <Button type="submit" color="gold" disabled={isSubmitting}>
                   {isSubmitting ? "Please wait..." : "Save"}
                 </Button>
