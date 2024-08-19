@@ -19,7 +19,12 @@ import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
 import InputDate from "@/components/global/InputDate";
 import AsyncSelect from "react-select/async";
-import { getAgentBySearch, getAllAgent, getSalesContractById } from "./service";
+import {
+  getAgentById,
+  getAgentBySearch,
+  getAllAgent,
+  getSalesContractById,
+} from "./service";
 import { useQuery } from "react-query";
 import TableItems from "./table/items";
 import ModalAddProduct from "./ModalAddProduct";
@@ -56,6 +61,14 @@ export default function EditSalesContract() {
   );
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
+  const [idAgent, setIdAgent] = useState("");
+
+  const { data: agentById, isLoading: loadingAgentById } = useQuery(
+    ["getAgentById", { id: idAgent || "" }],
+    getAgentById
+  );
+
+  console.log(idAgent);
 
   const schema = yup.object().shape({
     contractType: yup.string().required(),
@@ -87,6 +100,7 @@ export default function EditSalesContract() {
   const initializeValue = useMemo(() => {
     if (!loadingSalesContract && salesContract) {
       setItems(salesContract.items);
+      setIdAgent(salesContract.agent);
       return {
         contractType: salesContract.contractType,
         agent: salesContract.agent,
@@ -222,6 +236,10 @@ export default function EditSalesContract() {
                       defaultOptions={defaultOptions}
                       className="w-full pb-4"
                       styles={style}
+                      value={{
+                        value: "66bc6a22e4c2a83b1acf291b",
+                        label: "ASDASD",
+                      }}
                       onChange={(event) => setValue("agent", event.value)}
                       noOptionsMessage={() => "Agent not found"}
                     />

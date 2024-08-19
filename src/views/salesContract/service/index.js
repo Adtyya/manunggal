@@ -63,6 +63,16 @@ export const getAgentBySearch = async (query) => {
   }
 };
 
+export const getAgentById = async ({ queryKey }) => {
+  try {
+    const [key, query] = queryKey;
+    const res = await api.get(`/agent/${query.id}`);
+    return res.data;
+  } catch (error) {
+    return;
+  }
+};
+
 export const getProductBySearch = async (query) => {
   try {
     const res = await api.get(`/product?page=1&perPage=25&search=${query}`);
