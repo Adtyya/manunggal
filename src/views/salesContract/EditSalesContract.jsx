@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 // components
 import {
   Alert,
@@ -14,13 +14,12 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "@/utils/axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
-import InputPrice from "@/components/global/InputPrice";
 import InputDate from "@/components/global/InputDate";
 import AsyncSelect from "react-select/async";
-import { getAgentBySearch, getAllAgent } from "./service";
+import { getAgentBySearch, getAllAgent, getSalesContractById } from "./service";
 import { useQuery } from "react-query";
 import TableItems from "./table/items";
 import ModalAddProduct from "./ModalAddProduct";
@@ -35,14 +34,20 @@ const style = {
   }),
 };
 
-export default function CreateTicket() {
+export default function EditSalesContract() {
   const navigate = useNavigate();
   const ticket = useTicket();
+  const param = useParams();
   const today = new Date();
 
   const { data: agentList, isLoading } = useQuery(
     ["getAllAgent", { page: 1, search: "" }],
     getAllAgent
+  );
+
+  const { data: salesContract, isLoading: loadingSalesContract } = useQuery(
+    ["getSalesContractById", { id: param.id }],
+    getSalesContractById
   );
 
   const [error, setError] = useState(false);
@@ -79,6 +84,31 @@ export default function CreateTicket() {
     resolver: yupResolver(schema),
   });
 
+  const initializeValue = useMemo(() => {
+    if (!loadingSalesContract && salesContract) {
+      setItems(salesContract.items);
+      return {
+        contractType: salesContract.contractType,
+        agent: salesContract.agent,
+        deliveryFee: salesContract.deliveryFee,
+        totalPrice: salesContract.totalPrice,
+        notes: salesContract.notes,
+        payment: salesContract.payment,
+        tax: salesContract.tax.percentage,
+        dp: salesContract.dp.percentage,
+      };
+    }
+    return null;
+  }, [salesContract, loadingSalesContract]);
+
+  useEffect(() => {
+    if (initializeValue) {
+      Object.keys(initializeValue).forEach((key) => {
+        setValue(key, initializeValue[key]);
+      });
+    }
+  }, [initializeValue, setValue]);
+
   const formState = watch();
   const price = lodash.sumBy(items, (item) => item?.price * item?.qty);
 
@@ -105,10 +135,10 @@ export default function CreateTicket() {
 
     data.contractDate = contractDate;
 
-    const res = await api.post("/sales-contract", data);
+    const res = await api.patch(`/sales-contract/${param.id}`, data);
     if (res?.status === 201 || res?.status === 200) {
       navigate("/dashboard/list-sales-contract");
-      ticket.setSuccess(true);
+      ticket.setEdit(true);
     } else {
       setError(true);
     }
@@ -126,7 +156,7 @@ export default function CreateTicket() {
       {/* page title  */}
       <Row>
         <Column className="w-full md:w-1/2 px-4">
-          <p className="text-xl font-bold mt-3 mb-5">Create Sales Contract</p>
+          <p className="text-xl font-bold mt-3 mb-5">Edit Sales Contract</p>
         </Column>
       </Row>
 
@@ -277,7 +307,7 @@ export default function CreateTicket() {
                   <p className="font-medium">
                     Total Contract Amount :{" "}
                     {NumberFormat(
-                      price + Number(formState.deliveryFee) + tax - dp
+                      price + Number(formState.deliveryFee || 0) + tax - dp
                     )}
                   </p>
                 </Card>

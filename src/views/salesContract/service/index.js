@@ -35,9 +35,19 @@ export const getTicketsById = async ({ queryKey }) => {
   }
 };
 
+export const getSalesContractById = async ({ queryKey }) => {
+  try {
+    const [key, query] = queryKey;
+    const res = await api.get(`/sales-contract/${query.id}`);
+    return res.data;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const deleteTicketsById = async (id) => {
   try {
-    const res = await api.delete(`/product/${id}`);
+    const res = await api.delete(`/sales-contract/${id}`);
     return res.data;
   } catch (error) {
     return error;
