@@ -136,7 +136,7 @@ export default function EditSalesContract() {
         amount: dp,
       },
       items: items,
-      totalPrice: price + tax + Number(formState.deliveryFee) - dp,
+      totalPrice: price + tax + Number(formState.deliveryFee),
       contractDate: contractDate,
     };
 
@@ -323,15 +323,7 @@ export default function EditSalesContract() {
                       : {`${NumberFormat(formState.deliveryFee || 0)}`}
                     </p>
                   </div>
-                  <div className="grid grid-cols-2">
-                    <p className="font-medium">Dp</p>
-                    <p className="font-bold">
-                      :{" "}
-                      {`${NumberFormat(formState?.dp || 0)}% - ${NumberFormat(
-                        dp?.toFixed(0) || 0
-                      )}`}
-                    </p>
-                  </div>
+
                   <div className="grid grid-cols-2">
                     <p className="font-medium">Tax</p>
                     <p className="font-bold">
@@ -346,8 +338,17 @@ export default function EditSalesContract() {
                     <p className="font-bold">
                       :{" "}
                       {NumberFormat(
-                        price + Number(formState.deliveryFee) + tax - dp
+                        price + Number(formState.deliveryFee) + tax
                       )}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2">
+                    <p className="font-medium">Dp</p>
+                    <p className="font-bold">
+                      :{" "}
+                      {`${NumberFormat(formState?.dp || 0)}% - ${NumberFormat(
+                        dp?.toFixed(0) || 0
+                      )}`}
                     </p>
                   </div>
                 </Card>
