@@ -7,7 +7,6 @@ import {
   InputPassword,
   Alert,
 } from "@/components/reactdash-ui";
-import AuthCoverLayout from "./AuthCoverLayout";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -79,41 +78,58 @@ export default function SignIn() {
   };
 
   return (
-    <AuthCoverLayout>
-      <Heading variant="h3" className="text-center">
-        Login
-      </Heading>
-      <hr className="block w-12 h-0.5 mx-auto my-5 bg-primary-color border-primary-color" />
-      {openMessage && <Alert color="danger" setState={() => setOpenMessage(false)}>{message}</Alert>}
-      <form onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}>
-        <InputLabel
-          type="text"
-          name="username"
-          label="Username"
-          register={register}
-        />
-        <div className="mb-4">
-          <div className="flex flex-row justify-between items-center mb-2">
-            <label htmlFor="inputpass" className="inline-block">
-              Password
-            </label>
-          </div>
-          <InputPassword type="password" name="password" register={register} />
-        </div>
+    <div className="flex">
+      <div className="min-h-screen w-full sm:w-2/4 xl:w-1/3">
+        <div className="max-w-full w-full h-full px-6 sm:px-12 bg-white dark:bg-gray-800 shadow-lg">
+          <div className="p-6 sm:p-8">
+            <Heading variant="h3" className="text-center">
+              Login
+            </Heading>
+            <hr className="block w-12 h-0.5 mx-auto my-5 bg-primary-color border-primary-color" />
+            {openMessage && <Alert color="danger" setState={() => setOpenMessage(false)}>{message}</Alert>}
+            <form onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}>
+              <InputLabel
+                type="text"
+                name="username"
+                label="Username"
+                register={register}
+              />
+              <div className="mb-4">
+                <div className="flex flex-row justify-between items-center mb-2">
+                  <label htmlFor="inputpass" className="inline-block">
+                    Password
+                  </label>
+                </div>
+                <InputPassword type="password" name="password" register={register} />
+              </div>
 
-        <div className="grid">
-          <Button color="gold" type="submit" disabled={loading}>
-            {loading ? (
-              "Please wait"
-            ) : (
-              <>
-                <BoxArrowInRight className="inline-block w-4 h-4 ltr:mr-2 rtl:ml-2" />
-                Login
-              </>
-            )}
-          </Button>
+              <div className="grid">
+                <Button color="gold" type="submit" disabled={loading}>
+                  {loading ? (
+                    "Please wait"
+                  ) : (
+                    <>
+                      <BoxArrowInRight className="inline-block w-4 h-4 ltr:mr-2 rtl:ml-2" />
+                      Login
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </AuthCoverLayout>
+      </div>
+      <div className="min-h-screen sm:w-2/4 xl:w-2/3"
+        style={{
+          backgroundImage: "url('/img/auth/cover.jpg')",
+          backgroundColor: "#ffffff",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        }}
+      >
+        <div className="min-h-screen w-full bg-black bg-opacity-20" />
+      </div>
+    </div>
   );
 }
