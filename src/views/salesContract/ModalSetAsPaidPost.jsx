@@ -41,12 +41,14 @@ export default function ModalSetAsPaidPost({ open, setOpen, data }) {
           <b>Terbayar/Paid</b>
         </p>
         <div className="pt-2.5"></div>
-        <div className="text-red-500">
-          <p>Error saat membuat data.</p>
-          <ul className="list-disc list-inside">
-            <li>{message}</li>
-          </ul>
-        </div>
+        {message ? (
+          <div className="text-red-500">
+            <p>Error saat membuat data.</p>
+            <ul className="list-disc list-inside">
+              <li>{message}</li>
+            </ul>
+          </div>
+        ) : null}
         <div className="pb-2.5" />
         <div className="flex justify-center items-center w-full space-x-5 my-2.5">
           <Button color="outline-gold" onClick={() => setOpen(false)}>

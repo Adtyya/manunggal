@@ -17,21 +17,24 @@ import { api } from "@/utils/axios";
 import { useNavigate, useParams } from "react-router-dom";
 import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
-import InputDate from "@/components/global/InputDate";
 import AsyncSelect from "react-select/async";
 import {
-  getAgentById,
-  getAgentBySearch,
   getAllAgent,
-  getSalesContractById,
+  getAllSalesContract,
+  getAllSalesOrder,
+  getCustomerBySearch,
+  getSalesContractBySearch,
+  getSalesOrderById,
+  getSOBySearch,
 } from "./service";
 import { useQuery } from "react-query";
 import TableItems from "./table/items";
 import ModalAddProduct from "./ModalAddProduct";
 import NumberFormat from "@/utils/numberFormat";
 import lodash from "lodash";
-import ModalSetAsPaid from "./ModalSetAsPaid";
+import ModalSetAsPaidPost from "./ModalSetAsPaidPost";
 import InputPriceMod from "@/components/global/InputPriceMod";
+import ModalSetAsPaid from "./ModalSetAsPaid";
 
 const style = {
   control: (base) => ({
@@ -41,44 +44,71 @@ const style = {
   }),
 };
 
-export default function EditSalesContract() {
+export default function CreateTicket() {
   const navigate = useNavigate();
   const ticket = useTicket();
   const param = useParams();
-  const today = new Date();
+  // const today = new Date();
+
+  const { data: DetailSo, isLoading: LoadDetailSo } = useQuery(
+    ["getSalesOrderById", { id: param.id }],
+    getSalesOrderById
+  );
+
+  const { data: SCList, isLoading: SCLoading } = useQuery(
+    ["getAllSalesContract", { page: 1, search: "" }],
+    getAllSalesContract
+  );
 
   const { data: agentList, isLoading } = useQuery(
-    ["getAllAgent", { page: 1, search: "" }],
+    ["getAllCustomer", { page: 1, search: "" }],
     getAllAgent
   );
 
-  const { data: salesContract, isLoading: loadingSalesContract } = useQuery(
-    ["getSalesContractById", { id: param.id }],
-    getSalesContractById
+  const { data: SOList, isLoading: SOLoading } = useQuery(
+    ["getAllSalesOrder", { page: 1, search: "" }],
+    getAllSalesOrder
   );
 
   const [error, setError] = useState(false);
-  const [contractDate, setContractDate] = useState(
-    new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  );
+  // const [salesDate, setSalesDate] = useState(
+  //   new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  // );
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [paid, setPaid] = useState(false);
+  const [shipment, setShipment] = useState(false);
 
   const schema = yup.object().shape({
-    contractType: yup.string().required(),
-    agent: yup.string().required(),
-    deliveryFee: yup.number().required(),
+    orderType: yup.string().required(),
+    agent: yup.string(),
+    salesContract: yup.string().required(),
+    customer: yup.string().required(),
+    shipTo: yup.string().required(),
+    replacementFor: yup.string().nullable(),
+    deliveryFee: yup.number(),
     totalPrice: yup.number(),
     notes: yup.string(),
-    payment: yup.string().required(),
     tax: yup.number(),
     dp: yup.number(),
   });
 
+  const defaultOptionsSO = useMemo(() => {
+    return SOList?.docs?.map((item) => {
+      return {
+        value: item._id,
+        label: `${item?.salesId} - ${item?.agent?.name}`,
+      };
+    });
+  }, [SOList]);
+
   const defaultOptions = useMemo(() => {
     return agentList?.docs?.map((item) => {
-      return { value: item._id, label: item.name };
+      return {
+        value: item._id,
+        label: item.name,
+        address: `${item.name}, ${item?.phone} - ${item?.address}`,
+      };
     });
   }, [agentList]);
 
@@ -93,23 +123,26 @@ export default function EditSalesContract() {
   });
 
   const initializeValue = useMemo(() => {
-    if (!loadingSalesContract && salesContract) {
-      setItems(salesContract.items);
-      setContractDate(salesContract.contractDate);
+    if (!LoadDetailSo && DetailSo) {
+      setItems(DetailSo.items);
       return {
-        contractType: salesContract?.contractType,
-        agent: salesContract?.agent?._id,
-        agentName: salesContract?.agent?.name,
-        deliveryFee: salesContract?.deliveryFee,
-        totalPrice: salesContract?.totalPrice,
-        notes: salesContract?.notes,
-        payment: salesContract?.payment,
-        tax: salesContract?.tax.percentage,
-        dp: salesContract?.dp.percentage,
+        orderType: DetailSo.orderType,
+        agent: DetailSo?.agent?._id,
+        salesContract: DetailSo?.salesContract?._id,
+        salesContractName: DetailSo?.salesContract?.contractId,
+        customer: DetailSo?.customer?._id,
+        customerName: DetailSo?.customer?.name,
+        replacementFor: DetailSo?.replacementFor,
+        deliveryFee: DetailSo?.deliveryFee,
+        totalPrice: DetailSo?.totalPrice,
+        notes: DetailSo?.notes,
+        shipTo: DetailSo?.shipTo,
+        tax: DetailSo?.tax?.percentage,
+        dp: DetailSo?.dp?.percentage,
       };
     }
     return null;
-  }, [salesContract, loadingSalesContract]);
+  }, [DetailSo, LoadDetailSo]);
 
   useEffect(() => {
     if (initializeValue) {
@@ -138,41 +171,58 @@ export default function EditSalesContract() {
       },
       items: items,
       totalPrice: price + tax + Number(formState.deliveryFee),
-      contractDate: contractDate,
     };
 
-    const res = await api.patch(`/sales-contract/${param.id}`, newData);
+    const res = await api.patch(`/sales-order/${param.id}`, newData);
     if (res?.status === 201 || res?.status === 200) {
-      navigate("/dashboard/list-sales-contract");
-      ticket.setEdit(true);
+      navigate("/dashboard/list-sales-order");
+      ticket.setSuccess(true);
     } else {
       setError(true);
     }
   }
 
-  const promise = async (q) => {
-    const res = await getAgentBySearch(q);
+  const payload = {
+    ...formState,
+    tax: {
+      percentage: formState.tax,
+      amount: tax,
+    },
+    dp: {
+      percentage: formState.dp,
+      amount: dp,
+    },
+    items: items,
+    totalPrice: price + tax + Number(formState.deliveryFee),
+  };
+
+  const promiseReplacement = async (q) => {
+    const res = await getSOBySearch(q);
     return res.docs?.map((item) => {
-      return { value: item._id, label: item.name };
+      return {
+        value: item._id,
+        label: `${item?.contractId} - ${item?.agent?.name}`,
+      };
     });
   };
 
-  if (isLoading || loadingSalesContract) {
-    return (
-      <div className="w-full h-96 flex items-center justify-center">
-        <p className="capitalize">Loading sales contract...</p>
-      </div>
-    );
-  }
+  const promise = async (q) => {
+    const res = await getCustomerBySearch(q);
+    return res.docs?.map((item) => {
+      return {
+        value: item._id,
+        label: item.name,
+        address: `${item.name}, ${item?.phone} - ${item?.address}`,
+      };
+    });
+  };
 
   return (
     <>
       {/* page title  */}
       <Row>
         <Column className="w-full md:w-1/2 px-4">
-          <p className="text-xl font-bold mt-3 mb-5">
-            Edit Sales Contract - {salesContract?.contractId}
-          </p>
+          <p className="text-xl font-bold mt-3 mb-5">Edit Sales Order</p>
         </Column>
       </Row>
 
@@ -192,45 +242,40 @@ export default function EditSalesContract() {
             >
               <Card>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  <Select
-                    name="contractType"
-                    label="Contract Type"
-                    disabled
-                    options={[
-                      {
-                        title: "Export",
-                        value: "EXPORT",
-                      },
-                      {
-                        title: "Local",
-                        value: "LOCAL",
-                      },
-                      {
-                        title: "Kaber",
-                        value: "KABER",
-                      },
-                      {
-                        title: "Stock Order",
-                        value: "STOCK ORDER",
-                      },
-                      {
-                        title: "AFVAL",
-                        value: "AFVAL",
-                      },
-                    ]}
-                    required
+                  <InputLabel
+                    label="Sales Contract No."
+                    name="salesContractName"
                     register={register}
-                    showInitialValue
+                    readOnly
                   />
-                  <InputDate
-                    label="Select Contract Date"
-                    value={contractDate}
-                    onChange={(e) => setContractDate(e)}
-                    required
+                  <InputLabel
+                    label="Order Type"
+                    name="orderType"
+                    register={register}
+                    readOnly
                   />
+
                   <div className="w-full">
                     <label className="inline-block mb-2">
-                      Agent
+                      Replacement For SO
+                    </label>
+                    <AsyncSelect
+                      cacheOptions
+                      loadOptions={promiseReplacement}
+                      defaultOptions={defaultOptionsSO}
+                      className="w-full pb-4"
+                      styles={style}
+                      onChange={(event) =>
+                        setValue("replacementFor", event.value)
+                      }
+                      noOptionsMessage={() => "SO not found"}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="w-full">
+                    <label className="inline-block mb-2">
+                      Customer
                       <span className="text-red-500">*</span>
                     </label>
                     <AsyncSelect
@@ -240,54 +285,80 @@ export default function EditSalesContract() {
                       className="w-full pb-4"
                       styles={style}
                       value={{
-                        value: formState.agent,
-                        label: formState.agentName,
+                        value: formState?.customer,
+                        label: formState?.customerName,
                       }}
                       onChange={(event) => {
-                        setValue("agent", event.value);
-                        setValue("agentName", event.label);
+                        setValue("customer", event.value);
+                        setValue("customerName", event.label);
                       }}
                       noOptionsMessage={() => "Agent not found"}
                     />
                   </div>
+                  {shipment ? (
+                    <div>
+                      <div className="w-full">
+                        <label className="inline-block mb-2">
+                          Ship To
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <AsyncSelect
+                          cacheOptions
+                          loadOptions={promise}
+                          defaultOptions={defaultOptions}
+                          className="w-full pb-4"
+                          styles={style}
+                          onChange={(event) =>
+                            setValue("shipTo", event.address)
+                          }
+                          noOptionsMessage={() => "Agent not found"}
+                        />
+                      </div>
+                      <Button
+                        color="gold"
+                        onClick={() => {
+                          setShipment(!shipment);
+                          setValue("shipTo", DetailSo?.shipTo);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <InputLabel
+                        label="Shipment To"
+                        name="shipTo"
+                        register={register}
+                        readOnly
+                      />
+                      <Button
+                        color="gold"
+                        onClick={() => setShipment(!shipment)}
+                      >
+                        Change Shipment
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </Card>
-              <Card>
-                <TableItems
-                  setOpen={() => setOpen(true)}
-                  items={items}
-                  setItems={setItems}
-                />
-              </Card>
-              <Card>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <Card className="col-auto md:col-span-2">
+                  <TableItems
+                    // setOpen={() => setOpen(true)}
+                    items={items}
+                    // setItems={setItems}
+                  />
+                </Card>
+                <Card className="col-auto md:col-span-1">
                   <Textarea
                     name="notes"
-                    label="Contract Notes"
+                    label="Order Notes"
                     register={register}
-                    required
                     error={errors?.notes?.message}
                   />
-                  <Select
-                    name="payment"
-                    label="Payment Type"
-                    showInitialValue
-                    options={[
-                      {
-                        title: "Cash",
-                        value: "cash",
-                      },
-                      {
-                        title: "Bank Transaction",
-                        value: "bank transaction",
-                      },
-                    ]}
-                    required
-                    register={register}
-                    error={errors?.payment?.message}
-                  />
-                </div>
-              </Card>
+                </Card>
+              </div>
               <div className="grid grid-cols-2 gap-5">
                 <Card>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -365,23 +436,23 @@ export default function EditSalesContract() {
                 setOpen={() => setOpen(false)}
                 setItems={setItems}
               />
-
               <ModalSetAsPaid
                 open={paid}
                 setOpen={setPaid}
-                selected={salesContract?._id}
+                selected={param.id}
               />
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
-                <Link to="/dashboard/list-sales-contract">
+                <Link to="/dashboard/list-sales-order">
                   <Button color="outline-gold">Back</Button>
                 </Link>
                 <Button
                   type="button"
                   color="gold"
                   onClick={() => setPaid(true)}
+                  disabled={items?.length === 0}
                 >
-                  {isSubmitting ? "Please wait..." : "Set as paid"}
+                  {"Set as paid"}
                 </Button>
                 <Button type="submit" color="gold" disabled={isSubmitting}>
                   {isSubmitting ? "Please wait..." : "Save"}

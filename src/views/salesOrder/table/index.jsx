@@ -75,7 +75,7 @@ export default function TableVisitors(props) {
               <th className="text-left">Customer</th>
               <th className="text-left">Price</th>
               <th className="text-left">Payment</th>
-              <th className="text-left">Status</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -104,16 +104,16 @@ export default function TableVisitors(props) {
                   return (
                     <tr key={id}>
                       <td className="text-center">
-                        {formatDate(item.contractDate)}
+                        {formatDate(item.salesDate)}
                       </td>
                       <td>
-                        <p>{item.contractType}</p>
+                        <p>{item.orderType}</p>
                       </td>
                       <td>
-                        <p>{item.contractId}</p>
+                        <p>{item.salesId}</p>
                       </td>
                       <td>
-                        <p>{item.agent.name}</p>
+                        <p>{item.customer.name}</p>
                       </td>
                       <td>
                         <p>
@@ -135,7 +135,7 @@ export default function TableVisitors(props) {
                         <div className="flex items-center justify-center gap-1.5">
                           {item.status !== "paid" ? (
                             <Link
-                              to={`/dashboard/edit-sales-contract/${item._id}`}
+                              to={`/dashboard/edit-sales-order/${item._id}`}
                             >
                               <Button color="light" size="small">
                                 <PencilSquare className="inline text-primary-color" />

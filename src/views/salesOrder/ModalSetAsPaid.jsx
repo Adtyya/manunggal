@@ -15,16 +15,16 @@ export default function ModalSetAsPaid({ open, setOpen, selected }) {
   const handlePaid = async () => {
     try {
       setLoading(true);
-      await api.patch(`/sales-contract/${selected}`, {
+      await api.patch(`/sales-order/${selected}`, {
         status: "paid",
       });
       ticket.setEdit(true);
-      client.invalidateQueries("contractSales");
+      client.invalidateQueries("salesOrder");
     } catch (error) {
       console.warn("Something went wrong");
     } finally {
       setLoading(false);
-      navigate("/dashboard/list-sales-contract");
+      navigate("/dashboard/list-sales-order");
     }
   };
 

@@ -12,23 +12,10 @@ export const getTickets = async ({ queryKey }) => {
   }
 };
 
-export const getAvailableTickets = async (query) => {
-  try {
-    const res = await api.get(
-      `/ticket/available?page=${query?.page || 1}&perPage=10&search=${
-        query?.search || ""
-      }`
-    );
-    return res.data;
-  } catch (error) {
-    return error;
-  }
-};
-
-export const getTicketsById = async ({ queryKey }) => {
+export const getSalesOrderById = async ({ queryKey }) => {
   try {
     const [key, query] = queryKey;
-    const res = await api.get(`/product/${query.id}`);
+    const res = await api.get(`/sales-order/${query.id}`);
     return res.data;
   } catch (error) {
     return error;
@@ -45,9 +32,9 @@ export const getSalesContractById = async ({ queryKey }) => {
   }
 };
 
-export const deleteTicketsById = async (id) => {
+export const deleteSalesOrder = async (id) => {
   try {
-    const res = await api.delete(`/sales-contract/${id}`);
+    const res = await api.delete(`/sales-order/${id}`);
     return res.data;
   } catch (error) {
     return error;

@@ -83,7 +83,6 @@ export default function CreateTicket() {
     deliveryFee: yup.number(),
     totalPrice: yup.number(),
     notes: yup.string(),
-    payment: yup.string().required(),
     tax: yup.number(),
     dp: yup.number(),
   });
@@ -98,6 +97,7 @@ export default function CreateTicket() {
         dp: item.dp.percentage,
         tax: item.tax.percentage,
         deliveryFee: item.deliveryFee,
+        agent: item.agent._id,
       };
     });
   }, [SCList]);
@@ -106,7 +106,7 @@ export default function CreateTicket() {
     return SOList?.docs?.map((item) => {
       return {
         value: item._id,
-        label: `${item?.contractId} - ${item?.agent?.name}`,
+        label: `${item?.salesId} - ${item?.agent?.name}`,
       };
     });
   }, [SOList]);
@@ -116,6 +116,7 @@ export default function CreateTicket() {
       return {
         value: item._id,
         label: item.name,
+        address: `${item.name}, ${item?.phone} - ${item?.address}`,
       };
     });
   }, [agentList]);
@@ -153,7 +154,7 @@ export default function CreateTicket() {
 
     const res = await api.post("/sales-order", newData);
     if (res?.status === 201 || res?.status === 200) {
-      navigate("/dashboard/list-sales-contract");
+      navigate("/dashboard/list-sales-order");
       ticket.setSuccess(true);
     } else {
       setError(true);
@@ -171,8 +172,7 @@ export default function CreateTicket() {
       amount: dp,
     },
     items: items,
-    totalPrice: price + tax + Number(formState.deliveryFee) - dp,
-    salesDate: salesDate,
+    totalPrice: price + tax + Number(formState.deliveryFee),
   };
 
   const promiseReplacement = async (q) => {
@@ -188,7 +188,11 @@ export default function CreateTicket() {
   const promise = async (q) => {
     const res = await getCustomerBySearch(q);
     return res.docs?.map((item) => {
-      return { value: item._id, label: item.name };
+      return {
+        value: item._id,
+        label: item.name,
+        address: `${item.name}, ${item?.phone} - ${item?.address}`,
+      };
     });
   };
 
@@ -203,6 +207,7 @@ export default function CreateTicket() {
         dp: item.dp.percentage,
         tax: item.tax.percentage,
         deliveryFee: item.deliveryFee,
+        agent: item.agent._id,
       };
     });
   };
@@ -250,6 +255,7 @@ export default function CreateTicket() {
                         setValue("dp", event.dp);
                         setValue("tax", event.tax);
                         setValue("deliveryFee", event.deliveryFee);
+                        setValue("agent", event.agent);
                       }}
                       noOptionsMessage={() => "Agent not found"}
                     />
@@ -286,7 +292,6 @@ export default function CreateTicket() {
                   <div className="w-full">
                     <label className="inline-block mb-2">
                       Replacement For SO
-                      <span className="text-red-500">*</span>
                     </label>
                     <AsyncSelect
                       cacheOptions
@@ -328,26 +333,26 @@ export default function CreateTicket() {
                       defaultOptions={defaultOptions}
                       className="w-full pb-4"
                       styles={style}
-                      onChange={(event) => setValue("shipTo", event.value)}
+                      onChange={(event) => setValue("shipTo", event.address)}
                       noOptionsMessage={() => "Agent not found"}
                     />
                   </div>
                 </div>
               </Card>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <Card>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <Card className="col-auto md:col-span-2">
+                  <TableItems
+                    // setOpen={() => setOpen(true)}
+                    items={items}
+                    // setItems={setItems}
+                  />
+                </Card>
+                <Card className="col-auto md:col-span-1">
                   <Textarea
                     name="notes"
                     label="Order Notes"
                     register={register}
                     error={errors?.notes?.message}
-                  />
-                </Card>
-                <Card>
-                  <TableItems
-                    // setOpen={() => setOpen(true)}
-                    items={items}
-                    // setItems={setItems}
                   />
                 </Card>
               </div>
@@ -435,7 +440,7 @@ export default function CreateTicket() {
               />
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
-                <Link to="/dashboard/list-sales-contract">
+                <Link to="/dashboard/list-sales-order">
                   <Button color="outline-gold">Back</Button>
                 </Link>
                 <Button

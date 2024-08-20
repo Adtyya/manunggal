@@ -18,10 +18,10 @@ export default function ModalSetAsPaidPost({ open, setOpen, data }) {
     try {
       setLoading(true);
       data.status = "paid";
-      res = await api.post(`/sales-contract`, data);
+      res = await api.post(`/sales-order`, data);
       setMessage(res?.data?.message);
       ticket.setEdit(true);
-      client.invalidateQueries("contractSales");
+      client.invalidateQueries("salesOrder");
     } catch (error) {
       console.warn("Something went wrong");
     } finally {
@@ -37,16 +37,18 @@ export default function ModalSetAsPaidPost({ open, setOpen, data }) {
     <ModalBase isOpen={open} closeModal={setOpen}>
       <div className="bg-white w-full max-w-md flex flex-col items-center justify-center p-3.5 rounded-lg">
         <p className="font-semibold text-lg text-center">
-          Anda yakin ingin menyimpan sales contract dengan status{" "}
+          Anda yakin ingin menyimpan sales order dengan status{" "}
           <b>Terbayar/Paid</b>
         </p>
         <div className="pt-2.5"></div>
-        <div className="text-red-500">
-          <p>Error saat membuat data.</p>
-          <ul className="list-disc list-inside">
-            <li>{message}</li>
-          </ul>
-        </div>
+        {message ? (
+          <div className="text-red-500">
+            <p>Error saat membuat data.</p>
+            <ul className="list-disc list-inside">
+              <li>{message}</li>
+            </ul>
+          </div>
+        ) : null}
         <div className="pb-2.5" />
         <div className="flex justify-center items-center w-full space-x-5 my-2.5">
           <Button color="outline-gold" onClick={() => setOpen(false)}>

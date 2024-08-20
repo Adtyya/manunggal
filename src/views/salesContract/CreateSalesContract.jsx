@@ -124,7 +124,7 @@ export default function CreateTicket() {
       amount: dp,
     },
     items: items,
-    totalPrice: price + tax + Number(formState.deliveryFee) - dp,
+    totalPrice: price + tax + Number(formState.deliveryFee),
     contractDate: contractDate,
   };
 

@@ -1,7 +1,7 @@
 import ModalBase from "@/components/global/Modal";
 import { Button } from "@/components/reactdash-ui";
 import useTicket from "./hook/useTickets";
-import { deleteTicketsById } from "./service";
+import { deleteSalesOrder } from "./service";
 import { useState } from "react";
 import { useQueryClient } from "react-query";
 
@@ -13,9 +13,9 @@ export default function ModalDelete({ open, setOpen, selected }) {
   const handleDelete = async () => {
     try {
       setLoading(true);
-      await deleteTicketsById(selected);
+      await deleteSalesOrder(selected);
       ticket.setDelete(true);
-      client.invalidateQueries("contractSales");
+      client.invalidateQueries("salesOrder");
     } catch (error) {
       console.warn("Something went wrong");
     } finally {
