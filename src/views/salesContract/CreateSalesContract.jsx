@@ -304,7 +304,7 @@ export default function CreateTicket() {
                     <p className="font-bold">
                       :{" "}
                       {NumberFormat(
-                        price + Number(formState.deliveryFee) + tax
+                        price + Number(formState.deliveryFee || 0) + tax
                       )}
                     </p>
                   </div>

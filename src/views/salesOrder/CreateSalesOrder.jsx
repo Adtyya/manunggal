@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 // components
 import {
   Alert,
@@ -14,23 +14,19 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "@/utils/axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useTicket from "./hook/useTickets";
 import { Link } from "react-router-dom";
+import InputPrice from "@/components/global/InputPrice";
 import InputDate from "@/components/global/InputDate";
 import AsyncSelect from "react-select/async";
-import {
-  getAgentById,
-  getAgentBySearch,
-  getAllAgent,
-  getSalesContractById,
-} from "./service";
+import { getAgentBySearch, getAllAgent } from "./service";
 import { useQuery } from "react-query";
 import TableItems from "./table/items";
 import ModalAddProduct from "./ModalAddProduct";
 import NumberFormat from "@/utils/numberFormat";
 import lodash from "lodash";
-import ModalSetAsPaid from "./ModalSetAsPaid";
+import ModalSetAsPaidPost from "./ModalSetAsPaidPost";
 import InputPriceMod from "@/components/global/InputPriceMod";
 
 const style = {
@@ -41,20 +37,14 @@ const style = {
   }),
 };
 
-export default function EditSalesContract() {
+export default function CreateTicket() {
   const navigate = useNavigate();
   const ticket = useTicket();
-  const param = useParams();
   const today = new Date();
 
   const { data: agentList, isLoading } = useQuery(
     ["getAllAgent", { page: 1, search: "" }],
     getAllAgent
-  );
-
-  const { data: salesContract, isLoading: loadingSalesContract } = useQuery(
-    ["getSalesContractById", { id: param.id }],
-    getSalesContractById
   );
 
   const [error, setError] = useState(false);
@@ -68,7 +58,7 @@ export default function EditSalesContract() {
   const schema = yup.object().shape({
     contractType: yup.string().required(),
     agent: yup.string().required(),
-    deliveryFee: yup.number().required(),
+    deliveryFee: yup.number(),
     totalPrice: yup.number(),
     notes: yup.string(),
     payment: yup.string().required(),
@@ -92,33 +82,6 @@ export default function EditSalesContract() {
     resolver: yupResolver(schema),
   });
 
-  const initializeValue = useMemo(() => {
-    if (!loadingSalesContract && salesContract) {
-      setItems(salesContract.items);
-      setContractDate(salesContract.contractDate);
-      return {
-        contractType: salesContract?.contractType,
-        agent: salesContract?.agent?._id,
-        agentName: salesContract?.agent?.name,
-        deliveryFee: salesContract?.deliveryFee,
-        totalPrice: salesContract?.totalPrice,
-        notes: salesContract?.notes,
-        payment: salesContract?.payment,
-        tax: salesContract?.tax.percentage,
-        dp: salesContract?.dp.percentage,
-      };
-    }
-    return null;
-  }, [salesContract, loadingSalesContract]);
-
-  useEffect(() => {
-    if (initializeValue) {
-      Object.keys(initializeValue).forEach((key) => {
-        setValue(key, initializeValue[key]);
-      });
-    }
-  }, [initializeValue, setValue]);
-
   const formState = watch();
   const price = lodash.sumBy(items, (item) => item?.price * item?.qty);
 
@@ -141,14 +104,29 @@ export default function EditSalesContract() {
       contractDate: contractDate,
     };
 
-    const res = await api.patch(`/sales-contract/${param.id}`, newData);
+    const res = await api.post("/sales-contract", newData);
     if (res?.status === 201 || res?.status === 200) {
       navigate("/dashboard/list-sales-contract");
-      ticket.setEdit(true);
+      ticket.setSuccess(true);
     } else {
       setError(true);
     }
   }
+
+  const payload = {
+    ...formState,
+    tax: {
+      percentage: formState.tax,
+      amount: tax,
+    },
+    dp: {
+      percentage: formState.dp,
+      amount: dp,
+    },
+    items: items,
+    totalPrice: price + tax + Number(formState.deliveryFee) - dp,
+    contractDate: contractDate,
+  };
 
   const promise = async (q) => {
     const res = await getAgentBySearch(q);
@@ -157,22 +135,12 @@ export default function EditSalesContract() {
     });
   };
 
-  if (isLoading || loadingSalesContract) {
-    return (
-      <div className="w-full h-96 flex items-center justify-center">
-        <p className="capitalize">Loading sales contract...</p>
-      </div>
-    );
-  }
-
   return (
     <>
       {/* page title  */}
       <Row>
         <Column className="w-full md:w-1/2 px-4">
-          <p className="text-xl font-bold mt-3 mb-5">
-            Edit Sales Contract - {salesContract?.contractId}
-          </p>
+          <p className="text-xl font-bold mt-3 mb-5">Create Sales Order</p>
         </Column>
       </Row>
 
@@ -195,7 +163,6 @@ export default function EditSalesContract() {
                   <Select
                     name="contractType"
                     label="Contract Type"
-                    disabled
                     options={[
                       {
                         title: "Export",
@@ -239,14 +206,7 @@ export default function EditSalesContract() {
                       defaultOptions={defaultOptions}
                       className="w-full pb-4"
                       styles={style}
-                      value={{
-                        value: formState.agent,
-                        label: formState.agentName,
-                      }}
-                      onChange={(event) => {
-                        setValue("agent", event.value);
-                        setValue("agentName", event.label);
-                      }}
+                      onChange={(event) => setValue("agent", event.value)}
                       noOptionsMessage={() => "Agent not found"}
                     />
                   </div>
@@ -365,11 +325,10 @@ export default function EditSalesContract() {
                 setOpen={() => setOpen(false)}
                 setItems={setItems}
               />
-
-              <ModalSetAsPaid
+              <ModalSetAsPaidPost
                 open={paid}
                 setOpen={setPaid}
-                selected={salesContract?._id}
+                data={payload}
               />
 
               <div className="flex justify-end items-center mt-8 space-x-3.5">
@@ -380,8 +339,9 @@ export default function EditSalesContract() {
                   type="button"
                   color="gold"
                   onClick={() => setPaid(true)}
+                  disabled={items.length === 0}
                 >
-                  {isSubmitting ? "Please wait..." : "Set as paid"}
+                  {"Save & Set as paid"}
                 </Button>
                 <Button type="submit" color="gold" disabled={isSubmitting}>
                   {isSubmitting ? "Please wait..." : "Save"}

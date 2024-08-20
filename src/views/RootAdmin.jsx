@@ -36,6 +36,7 @@ import {
   EditSalesContract,
   SalesContract,
 } from "./salesContract";
+import { CreateSalesOrder, SalesOrder } from "./salesOrder";
 
 export default function RootAdmin() {
   return (
@@ -348,6 +349,13 @@ export default function RootAdmin() {
           exact
           path="/edit-sales-contract/:id"
           element={<EditSalesContract />}
+        />
+
+        <Route exact path="/list-sales-order" element={<SalesOrder />} />
+        <Route
+          exact
+          path="/create-sales-order"
+          element={<CreateSalesOrder />}
         />
       </Routes>
     </RootLayout>
