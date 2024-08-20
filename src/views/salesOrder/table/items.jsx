@@ -36,14 +36,14 @@ export default function TableItems(props) {
           <div></div>
         </div>
         <div className="w-48">
-          <Button
+          {/* <Button
             className="mb-4 block sm:inline-block w-full sm:w-full"
             color="gold"
             onClick={props.setOpen}
           >
             Add Product
             <PlusLg className="inline-block ltr:ml-1 rtl:mr-1 bi bi-plus-lg" />
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export default function TableItems(props) {
               <th className="text-left">Total Price</th>
               <th className="text-left">Unit</th>
               <th className="text-left">Notes</th>
-              <th>Action</th>
+              {/* <th>Action</th> */}
             </tr>
           </thead>
           {props.items?.length === 0 ? (
@@ -96,7 +96,7 @@ export default function TableItems(props) {
                       </td>
                       <td>{item.unit}</td>
                       <td>{item.notes}</td>
-                      <td className="text-center">
+                      {/* <td className="text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           <Button
                             color="light"
@@ -112,7 +112,7 @@ export default function TableItems(props) {
                             <Trash className="inline text-primary-color" />
                           </Button>
                         </div>
-                      </td>
+                      </td> */}
                     </tr>
                   );
                 })

@@ -63,6 +63,26 @@ export const getAgentBySearch = async (query) => {
   }
 };
 
+export const getCustomerBySearch = async (query) => {
+  try {
+    const res = await api.get(`/customer?page=1&perPage=25&search=${query}`);
+    return res.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getSalesContractBySearch = async (query) => {
+  try {
+    const res = await api.get(
+      `/sales-contract?page=1&perPage=25&search=${query}`
+    );
+    return res.data;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getAgentById = async ({ queryKey }) => {
   try {
     const [key, query] = queryKey;
@@ -86,7 +106,19 @@ export const getAllAgent = async ({ queryKey }) => {
   try {
     const [key, query] = queryKey;
     const res = await api.get(
-      `/agent?page=${query.page}&perPage=10&search=${query.search}`
+      `/customer?page=${query.page}&perPage=10&search=${query.search}`
+    );
+    return res.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getAllSalesContract = async ({ queryKey }) => {
+  try {
+    const [key, query] = queryKey;
+    const res = await api.get(
+      `/sales-contract?page=${query.page}&perPage=10&search=${query.search}`
     );
     return res.data;
   } catch (error) {

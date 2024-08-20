@@ -20,7 +20,13 @@ import { Link } from "react-router-dom";
 import InputPrice from "@/components/global/InputPrice";
 import InputDate from "@/components/global/InputDate";
 import AsyncSelect from "react-select/async";
-import { getAgentBySearch, getAllAgent } from "./service";
+import {
+  getAgentBySearch,
+  getAllAgent,
+  getAllSalesContract,
+  getCustomerBySearch,
+  getSalesContractBySearch,
+} from "./service";
 import { useQuery } from "react-query";
 import TableItems from "./table/items";
 import ModalAddProduct from "./ModalAddProduct";
@@ -42,13 +48,18 @@ export default function CreateTicket() {
   const ticket = useTicket();
   const today = new Date();
 
+  const { data: SCList, isLoading: SCLoading } = useQuery(
+    ["getAllSalesContract", { page: 1, search: "" }],
+    getAllSalesContract
+  );
+
   const { data: agentList, isLoading } = useQuery(
-    ["getAllAgent", { page: 1, search: "" }],
+    ["getAllCustomer", { page: 1, search: "" }],
     getAllAgent
   );
 
   const [error, setError] = useState(false);
-  const [contractDate, setContractDate] = useState(
+  const [salesDate, setSalesDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), today.getDate())
   );
   const [open, setOpen] = useState(false);
@@ -56,7 +67,7 @@ export default function CreateTicket() {
   const [paid, setPaid] = useState(false);
 
   const schema = yup.object().shape({
-    contractType: yup.string().required(),
+    orderType: yup.string().required(),
     agent: yup.string().required(),
     deliveryFee: yup.number(),
     totalPrice: yup.number(),
@@ -66,9 +77,22 @@ export default function CreateTicket() {
     dp: yup.number(),
   });
 
+  const defaultOptionsSC = useMemo(() => {
+    return SCList?.docs?.map((item) => {
+      return {
+        value: item._id,
+        label: `${item?.contractId} - ${item?.agent?.name}`,
+        item: item.items,
+      };
+    });
+  }, [agentList]);
+
   const defaultOptions = useMemo(() => {
     return agentList?.docs?.map((item) => {
-      return { value: item._id, label: item.name };
+      return {
+        value: item._id,
+        label: item.name,
+      };
     });
   }, [agentList]);
 
@@ -125,13 +149,24 @@ export default function CreateTicket() {
     },
     items: items,
     totalPrice: price + tax + Number(formState.deliveryFee) - dp,
-    contractDate: contractDate,
+    salesDate: salesDate,
   };
 
   const promise = async (q) => {
-    const res = await getAgentBySearch(q);
+    const res = await getCustomerBySearch(q);
     return res.docs?.map((item) => {
       return { value: item._id, label: item.name };
+    });
+  };
+
+  const promiseSC = async (q) => {
+    const res = await getSalesContractBySearch(q);
+    return res.docs?.map((item) => {
+      return {
+        value: item._id,
+        label: `${item?.contractId} - ${item?.agent?.name}`,
+        item: item.items,
+      };
     });
   };
 
@@ -160,9 +195,28 @@ export default function CreateTicket() {
             >
               <Card>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <div className="w-full">
+                    <label className="inline-block mb-2">
+                      Sales Contract No.
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <AsyncSelect
+                      cacheOptions
+                      loadOptions={promiseSC}
+                      defaultOptions={defaultOptionsSC}
+                      className="w-full pb-4"
+                      styles={style}
+                      onChange={(event) => {
+                        setValue("agent", event.value);
+                        setItems(event.item);
+                      }}
+                      noOptionsMessage={() => "Agent not found"}
+                    />
+                  </div>
                   <Select
-                    name="contractType"
-                    label="Contract Type"
+                    name="orderType"
+                    label="Order Type"
+                    disabled
                     options={[
                       {
                         title: "Export",
@@ -189,15 +243,9 @@ export default function CreateTicket() {
                     register={register}
                     showInitialValue
                   />
-                  <InputDate
-                    label="Select Contract Date"
-                    value={contractDate}
-                    onChange={(e) => setContractDate(e)}
-                    required
-                  />
                   <div className="w-full">
                     <label className="inline-block mb-2">
-                      Agent
+                      Customer
                       <span className="text-red-500">*</span>
                     </label>
                     <AsyncSelect
@@ -214,9 +262,9 @@ export default function CreateTicket() {
               </Card>
               <Card>
                 <TableItems
-                  setOpen={() => setOpen(true)}
+                  // setOpen={() => setOpen(true)}
                   items={items}
-                  setItems={setItems}
+                  // setItems={setItems}
                 />
               </Card>
               <Card>
