@@ -106,7 +106,7 @@ export default function CreateTicket() {
     return SOList?.docs?.map((item) => {
       return {
         value: item._id,
-        label: `${item?.salesId} - ${item?.agent?.name}`,
+        label: `${item?.salesId}`,
       };
     });
   }, [SOList]);
@@ -180,7 +180,7 @@ export default function CreateTicket() {
     return res.docs?.map((item) => {
       return {
         value: item._id,
-        label: `${item?.contractId} - ${item?.agent?.name}`,
+        label: `${item?.contractId}`,
       };
     });
   };
@@ -257,7 +257,7 @@ export default function CreateTicket() {
                         setValue("deliveryFee", event.deliveryFee);
                         setValue("agent", event.agent);
                       }}
-                      noOptionsMessage={() => "Agent not found"}
+                      noOptionsMessage={() => "Data not found"}
                     />
                   </div>
                   <Select
@@ -302,7 +302,7 @@ export default function CreateTicket() {
                       onChange={(event) =>
                         setValue("replacementFor", event.value)
                       }
-                      noOptionsMessage={() => "SO not found"}
+                      noOptionsMessage={() => "Data not found"}
                     />
                   </div>
                 </div>
@@ -319,7 +319,7 @@ export default function CreateTicket() {
                       className="w-full pb-4"
                       styles={style}
                       onChange={(event) => setValue("customer", event.value)}
-                      noOptionsMessage={() => "Agent not found"}
+                      noOptionsMessage={() => "Data not found"}
                     />
                   </div>
                   <div className="w-full">

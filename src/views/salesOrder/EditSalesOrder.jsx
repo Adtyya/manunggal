@@ -97,7 +97,7 @@ export default function CreateTicket() {
     return SOList?.docs?.map((item) => {
       return {
         value: item._id,
-        label: `${item?.salesId} - ${item?.agent?.name}`,
+        label: `${item?.salesId}`,
       };
     });
   }, [SOList]);
@@ -132,7 +132,8 @@ export default function CreateTicket() {
         salesContractName: DetailSo?.salesContract?.contractId,
         customer: DetailSo?.customer?._id,
         customerName: DetailSo?.customer?.name,
-        replacementFor: DetailSo?.replacementFor,
+        replacementFor: DetailSo?.replacementFor?._id,
+        replacementForName: DetailSo?.replacementFor?.salesId,
         deliveryFee: DetailSo?.deliveryFee,
         totalPrice: DetailSo?.totalPrice,
         notes: DetailSo?.notes,
@@ -182,26 +183,12 @@ export default function CreateTicket() {
     }
   }
 
-  const payload = {
-    ...formState,
-    tax: {
-      percentage: formState.tax,
-      amount: tax,
-    },
-    dp: {
-      percentage: formState.dp,
-      amount: dp,
-    },
-    items: items,
-    totalPrice: price + tax + Number(formState.deliveryFee),
-  };
-
   const promiseReplacement = async (q) => {
     const res = await getSOBySearch(q);
     return res.docs?.map((item) => {
       return {
         value: item._id,
-        label: `${item?.contractId} - ${item?.agent?.name}`,
+        label: `${item?.contractId}`,
       };
     });
   };
@@ -265,10 +252,15 @@ export default function CreateTicket() {
                       defaultOptions={defaultOptionsSO}
                       className="w-full pb-4"
                       styles={style}
-                      onChange={(event) =>
-                        setValue("replacementFor", event.value)
-                      }
-                      noOptionsMessage={() => "SO not found"}
+                      value={{
+                        value: formState?.replacementFor,
+                        label: formState?.replacementForName,
+                      }}
+                      onChange={(event) => {
+                        setValue("replacementFor", event.value);
+                        setValue("replacementForName", event.label);
+                      }}
+                      noOptionsMessage={() => "Data not found"}
                     />
                   </div>
                 </div>
@@ -292,7 +284,7 @@ export default function CreateTicket() {
                         setValue("customer", event.value);
                         setValue("customerName", event.label);
                       }}
-                      noOptionsMessage={() => "Agent not found"}
+                      noOptionsMessage={() => "Data not found"}
                     />
                   </div>
                   {shipment ? (
@@ -311,7 +303,7 @@ export default function CreateTicket() {
                           onChange={(event) =>
                             setValue("shipTo", event.address)
                           }
-                          noOptionsMessage={() => "Agent not found"}
+                          noOptionsMessage={() => "Data not found"}
                         />
                       </div>
                       <Button
