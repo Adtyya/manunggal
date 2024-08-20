@@ -72,6 +72,15 @@ export const getCustomerBySearch = async (query) => {
   }
 };
 
+export const getSOBySearch = async (query) => {
+  try {
+    const res = await api.get(`/sales-order?page=1&perPage=25&search=${query}`);
+    return res.data;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getSalesContractBySearch = async (query) => {
   try {
     const res = await api.get(
@@ -107,6 +116,18 @@ export const getAllAgent = async ({ queryKey }) => {
     const [key, query] = queryKey;
     const res = await api.get(
       `/customer?page=${query.page}&perPage=10&search=${query.search}`
+    );
+    return res.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getAllSalesOrder = async ({ queryKey }) => {
+  try {
+    const [key, query] = queryKey;
+    const res = await api.get(
+      `/sales-order?page=${query.page}&perPage=10&search=${query.search}`
     );
     return res.data;
   } catch (error) {

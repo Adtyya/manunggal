@@ -24,8 +24,10 @@ import {
   getAgentBySearch,
   getAllAgent,
   getAllSalesContract,
+  getAllSalesOrder,
   getCustomerBySearch,
   getSalesContractBySearch,
+  getSOBySearch,
 } from "./service";
 import { useQuery } from "react-query";
 import TableItems from "./table/items";
@@ -58,6 +60,11 @@ export default function CreateTicket() {
     getAllAgent
   );
 
+  const { data: SOList, isLoading: SOLoading } = useQuery(
+    ["getAllSalesOrder", { page: 1, search: "" }],
+    getAllSalesOrder
+  );
+
   const [error, setError] = useState(false);
   const [salesDate, setSalesDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), today.getDate())
@@ -68,7 +75,11 @@ export default function CreateTicket() {
 
   const schema = yup.object().shape({
     orderType: yup.string().required(),
-    agent: yup.string().required(),
+    agent: yup.string(),
+    salesContract: yup.string().required(),
+    customer: yup.string().required(),
+    shipTo: yup.string().required(),
+    replacementFor: yup.string(),
     deliveryFee: yup.number(),
     totalPrice: yup.number(),
     notes: yup.string(),
@@ -83,9 +94,22 @@ export default function CreateTicket() {
         value: item._id,
         label: `${item?.contractId} - ${item?.agent?.name}`,
         item: item.items,
+        type: item.contractType,
+        dp: item.dp.percentage,
+        tax: item.tax.percentage,
+        deliveryFee: item.deliveryFee,
       };
     });
-  }, [agentList]);
+  }, [SCList]);
+
+  const defaultOptionsSO = useMemo(() => {
+    return SOList?.docs?.map((item) => {
+      return {
+        value: item._id,
+        label: `${item?.contractId} - ${item?.agent?.name}`,
+      };
+    });
+  }, [SOList]);
 
   const defaultOptions = useMemo(() => {
     return agentList?.docs?.map((item) => {
@@ -125,10 +149,9 @@ export default function CreateTicket() {
       },
       items: items,
       totalPrice: price + tax + Number(formState.deliveryFee),
-      contractDate: contractDate,
     };
 
-    const res = await api.post("/sales-contract", newData);
+    const res = await api.post("/sales-order", newData);
     if (res?.status === 201 || res?.status === 200) {
       navigate("/dashboard/list-sales-contract");
       ticket.setSuccess(true);
@@ -152,6 +175,16 @@ export default function CreateTicket() {
     salesDate: salesDate,
   };
 
+  const promiseReplacement = async (q) => {
+    const res = await getSOBySearch(q);
+    return res.docs?.map((item) => {
+      return {
+        value: item._id,
+        label: `${item?.contractId} - ${item?.agent?.name}`,
+      };
+    });
+  };
+
   const promise = async (q) => {
     const res = await getCustomerBySearch(q);
     return res.docs?.map((item) => {
@@ -166,6 +199,10 @@ export default function CreateTicket() {
         value: item._id,
         label: `${item?.contractId} - ${item?.agent?.name}`,
         item: item.items,
+        type: item.contractType,
+        dp: item.dp.percentage,
+        tax: item.tax.percentage,
+        deliveryFee: item.deliveryFee,
       };
     });
   };
@@ -207,8 +244,12 @@ export default function CreateTicket() {
                       className="w-full pb-4"
                       styles={style}
                       onChange={(event) => {
-                        setValue("agent", event.value);
+                        setValue("salesContract", event.value);
                         setItems(event.item);
+                        setValue("orderType", event.type);
+                        setValue("dp", event.dp);
+                        setValue("tax", event.tax);
+                        setValue("deliveryFee", event.deliveryFee);
                       }}
                       noOptionsMessage={() => "Agent not found"}
                     />
@@ -216,7 +257,6 @@ export default function CreateTicket() {
                   <Select
                     name="orderType"
                     label="Order Type"
-                    disabled
                     options={[
                       {
                         title: "Export",
@@ -245,6 +285,25 @@ export default function CreateTicket() {
                   />
                   <div className="w-full">
                     <label className="inline-block mb-2">
+                      Replacement For SO
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <AsyncSelect
+                      cacheOptions
+                      loadOptions={promiseReplacement}
+                      defaultOptions={defaultOptionsSO}
+                      className="w-full pb-4"
+                      styles={style}
+                      onChange={(event) =>
+                        setValue("replacementFor", event.value)
+                      }
+                      noOptionsMessage={() => "SO not found"}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="w-full">
+                    <label className="inline-block mb-2">
                       Customer
                       <span className="text-red-500">*</span>
                     </label>
@@ -254,48 +313,44 @@ export default function CreateTicket() {
                       defaultOptions={defaultOptions}
                       className="w-full pb-4"
                       styles={style}
-                      onChange={(event) => setValue("agent", event.value)}
+                      onChange={(event) => setValue("customer", event.value)}
+                      noOptionsMessage={() => "Agent not found"}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <label className="inline-block mb-2">
+                      Ship To
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <AsyncSelect
+                      cacheOptions
+                      loadOptions={promise}
+                      defaultOptions={defaultOptions}
+                      className="w-full pb-4"
+                      styles={style}
+                      onChange={(event) => setValue("shipTo", event.value)}
                       noOptionsMessage={() => "Agent not found"}
                     />
                   </div>
                 </div>
               </Card>
-              <Card>
-                <TableItems
-                  // setOpen={() => setOpen(true)}
-                  items={items}
-                  // setItems={setItems}
-                />
-              </Card>
-              <Card>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <Card>
                   <Textarea
                     name="notes"
-                    label="Contract Notes"
+                    label="Order Notes"
                     register={register}
-                    required
                     error={errors?.notes?.message}
                   />
-                  <Select
-                    name="payment"
-                    label="Payment Type"
-                    showInitialValue
-                    options={[
-                      {
-                        title: "Cash",
-                        value: "cash",
-                      },
-                      {
-                        title: "Bank Transaction",
-                        value: "bank transaction",
-                      },
-                    ]}
-                    required
-                    register={register}
-                    error={errors?.payment?.message}
+                </Card>
+                <Card>
+                  <TableItems
+                    // setOpen={() => setOpen(true)}
+                    items={items}
+                    // setItems={setItems}
                   />
-                </div>
-              </Card>
+                </Card>
+              </div>
               <div className="grid grid-cols-2 gap-5">
                 <Card>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
