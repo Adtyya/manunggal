@@ -204,6 +204,14 @@ export default function CreateTicket() {
     });
   };
 
+  if (isLoading || SOLoading || SCLoading) {
+    return (
+      <div className="w-full h-96 flex items-center justify-center">
+        <p className="capitalize">Loading sales order...</p>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* page title  */}
